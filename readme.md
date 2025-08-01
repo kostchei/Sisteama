@@ -41,7 +41,7 @@ flowchart TD
     B --> C{Deterministic Tool?}
     C -- Yes --> D[Rule Engine / Game Logic]
     C -- No --> E[AI Agent / Prompt Chain]
-    E --> F[Context Protocol (MCP)]
+    E --> F["Context Protocol (MCP)"]
     D --> G[Response Builder]
     F --> G[Response Builder]
     G --> H[Output to User / Log]
