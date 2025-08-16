@@ -255,9 +255,9 @@ class DiceEngine:
                                advantage: AdvantageType, critical: bool) -> str:
         """Format description for d20 rolls"""
         if advantage == AdvantageType.ADVANTAGE:
-            base = f"Advantage: {rolls} → {max(rolls)}"
+            base = f"Advantage: {rolls} -> {max(rolls)}"
         elif advantage == AdvantageType.DISADVANTAGE:
-            base = f"Disadvantage: {rolls} → {min(rolls)}"
+            base = f"Disadvantage: {rolls} -> {min(rolls)}"
         else:
             base = f"Roll: {rolls[0]}"
         
