@@ -1,4 +1,15 @@
 """
+File: backend/routers/character.py
+Path: /backend/routers/character.py
+
+Pseudo Code:
+1. Get races/classes/backgrounds: return available options from database
+2. Create character: validate choices, calculate stats, assign equipment
+3. Get character: fetch character with all related data (race, class, equipment)
+4. Update character: modify attributes, recalculate derived stats
+5. Level up: check XP, increase level, add HP, apply features
+6. Rest: recover HP/abilities, reset conditions, manage hit dice
+
 Character Management Router
 Handles character creation, updates, and progression.
 

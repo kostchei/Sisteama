@@ -230,3 +230,103 @@ Multiplayer support (architecture supports it)
 Every file has extensive comments explaining where and how to add new features. The modular design means you can add systems incrementally without breaking existing functionality.
 
 https://claude.ai/public/artifacts/030a99f7-8d9e-4e9c-84b7-26c4bc1ab6ab
+
+## 📝 BLUEPRINT
+
+### Architecture Overview
+```
+┌─────────────┐     ┌──────────────┐     ┌────────────┐
+│   React UI  │────▶│  FastAPI     │────▶│ PostgreSQL │
+│  (Port 3000)│◀────│  (Port 8000) │◀────│  (Port     │
+└─────────────┘     └──────────────┘     │   5432)    │
+                                          └────────────┘
+        └──────────── Docker Compose ─────────────┘
+```
+
+### Core Database Tables
+```sql
+-- Extensible schema design
+characters (id, name, race, class, background, level, hp, stats...)
+character_equipment (character_id, item_id, equipped, slot)
+game_sessions (id, character_id, current_room, state, timestamp)
+monsters (id, name, hp, ac, attacks_json, behavior_script)
+combat_log (session_id, round, action, result)
+loot_tables (id, monster_id, item_pool_json, drop_chance)
+```
+
+### API Endpoints Structure
+```python
+/character/
+  POST /create    # Build new character
+  GET /{id}       # Load character + equipment
+  POST /levelup   # Handle advancement
+
+/combat/
+  POST /start     # Initialize encounter
+  POST /action    # Process player action
+  GET /state      # Current combat status
+
+/game/
+  POST /rest      # Short/long rest
+  POST /save      # Save progress
+  GET /load       # Load saved game
+```
+
+### UI Component Tree
+```
+App
+├── CharacterCreator
+│   ├── RaceSelector (Dwarf/Human)
+│   ├── ClassSelector (Fighter/Rogue)
+│   └── BackgroundSelector (Farmer/Soldier)
+├── GameScreen
+│   ├── CharacterSheet (top-left)
+│   ├── EncounterArea (center)
+│   │   ├── MonsterCards
+│   │   └── EnvironmentDesc
+│   ├── ActionCards (bottom)
+│   │   ├── ActionCard (red)
+│   │   ├── BonusCard (blue)
+│   │   └── ReactionCard (green)
+│   └── CombatLog (right)
+└── TownScreen
+    ├── RestOptions
+    └── ShopInterface (future)
+```
+
+### Sample Combat Flow
+```
+1. GET /combat/state → {monster: "Dretch", hp: 11, ac: 11}
+2. Player clicks Attack card → flips animation
+3. POST /combat/action → {action: "attack", weapon: "longsword"}
+4. Response: {hit: true, damage: 8, monster_action: {...}}
+5. Update UI: Monster HP, log entry, unflip cards if new round
+```
+
+### Directory Structure
+```
+dnd-game/
+├── docker-compose.yml
+├── backend/
+│   ├── Dockerfile
+│   ├── main.py          # FastAPI app
+│   ├── models/          # Pydantic/SQLAlchemy
+│   ├── combat_engine/   # D&D rules
+│   ├── database/        # Schema + migrations
+│   └── docs/            # Expansion guides
+├── frontend/
+│   ├── Dockerfile
+│   ├── src/
+│   │   ├── components/
+│   │   ├── gameLogic/
+│   │   └── api/
+│   └── public/
+└── postgres/
+    └── init.sql         # Initial schema + sample data
+```
+
+**Ready to build?**
+
+✅ **YES** - Start building  
+❌ **EDITS** - Adjust the plan  
+⚠️ **RISK** - Review failure scenarios
