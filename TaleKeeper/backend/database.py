@@ -74,6 +74,13 @@ def init_db():
     AI Agents: Add any seed data or initial setup here.
     """
     try:
+        # Import all models to ensure they're registered with Base
+        from models import (
+            Character, Item, CharacterInventory, ShopInventory, LootTable,
+            Monster, CombatEncounter, CombatAction, CombatLog,
+            GameState, SaveSlot, Race, Class, Subclass, Background
+        )
+        
         Base.metadata.create_all(bind=engine)
         logger.info("Database tables created/verified successfully")
     except Exception as e:
@@ -86,8 +93,9 @@ def test_connection():
     Useful for health checks and debugging.
     """
     try:
+        from sqlalchemy import text
         db = SessionLocal()
-        db.execute("SELECT 1")
+        db.execute(text("SELECT 1"))
         db.close()
         logger.info("Database connection successful")
         return True

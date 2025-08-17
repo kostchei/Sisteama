@@ -7,10 +7,11 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import os
+from datetime import datetime
 from loguru import logger
 
 # Import database and models
-from database import engine, Base, get_db
+from database import engine, Base, get_db, init_db
 from routers import character, combat, game, items
 
 # Configure logging
@@ -26,7 +27,7 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting D&D Game Backend...")
     # Create database tables if they don't exist
-    Base.metadata.create_all(bind=engine)
+    init_db()
     logger.info("Database tables verified/created")
     
     yield
@@ -108,7 +109,7 @@ async def health_check():
     return {
         "status": "healthy" if db_status == "healthy" else "degraded",
         "database": db_status,
-        "timestamp": logger.time()
+        "timestamp": datetime.utcnow().isoformat()
     }
 
 # Error handlers

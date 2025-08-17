@@ -1,4 +1,4 @@
-version: '3.8'
+# Docker Compose for TaleKeeper D&D Game
 
 services:
   # PostgreSQL Database
@@ -28,7 +28,7 @@ services:
     build: ./backend
     container_name: dnd_backend
     environment:
-      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_URL: postgresql://dnd_admin:secure_password_change_me@db:5432/dnd_game
       PYTHONUNBUFFERED: 1
     volumes:
       - ./backend:/app

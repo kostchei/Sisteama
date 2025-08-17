@@ -4,7 +4,11 @@
       "Bash(docker-compose up:*)",
       "Bash(docker compose:*)",
       "Bash(python:*)",
-      "Bash(dir)"
+      "Bash(dir)",
+      "Bash(docker:*)",
+      "Bash(psql:*)",
+      "Bash(where docker)",
+      "Bash(powershell:*)"
     ],
     "deny": []
   }
