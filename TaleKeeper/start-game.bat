@@ -168,20 +168,10 @@ start "TaleKeeper Backend" cmd /k "call venv\Scripts\activate.bat && python main
 REM Wait a moment for backend to start
 timeout /t 3 /nobreak >nul
 
-REM Test backend
-echo [INFO] Testing backend connection...
-timeout /t 2 /nobreak >nul
-python -c "
-import requests
-try:
-    response = requests.get('http://localhost:8000/health', timeout=5)
-    if response.status_code == 200:
-        print('[OK] Backend is responding')
-    else:
-        print('[WARNING] Backend health check failed')
-except:
-    print('[WARNING] Backend may still be starting...')
-" 2>nul
+REM Backend is starting in background window
+echo [INFO] Backend server is starting in separate window...
+timeout /t 3 /nobreak >nul
+echo [INFO] Backend should be available at http://localhost:8000
 
 REM Start frontend
 echo [INFO] Starting frontend...
@@ -327,35 +317,10 @@ if exist requirements.txt (
     pip install -r requirements.txt >nul 2>&1
     
     echo [INFO] Testing database connection...
-    python -c "
-from database import test_connection, init_db
-try:
-    if test_connection():
-        print('[PASS] Database connection successful')
-        init_db()
-        print('[PASS] Database tables created/verified')
-        
-        # Test API
-        from main import app
-        from fastapi.testclient import TestClient
-        client = TestClient(app)
-        
-        response = client.get('/health')
-        if response.status_code == 200:
-            print('[PASS] Health endpoint working')
-        
-        response = client.get('/api/items/equipment')
-        if response.status_code == 200:
-            print('[PASS] Items API working')
-        
-        route_count = len([r for r in app.routes if hasattr(r, 'path')])
-        print(f'[INFO] Total API routes: {route_count}')
-        
-    else:
-        print('[FAIL] Database connection failed')
-except Exception as e:
-    print(f'[FAIL] Error: {e}')
-"
+    python -c "from database import test_connection, init_db; print('[PASS] Database connection successful') if test_connection() else print('[FAIL] Database connection failed'); init_db(); print('[PASS] Database tables created/verified')" 2>nul
+    
+    echo [INFO] Testing API endpoints...
+    python -c "from main import app; from fastapi.testclient import TestClient; client = TestClient(app); r1 = client.get('/health'); r2 = client.get('/api/items/equipment'); print('[PASS] Health endpoint working' if r1.status_code == 200 else '[FAIL] Health endpoint failed'); print('[PASS] Items API working' if r2.status_code == 200 else '[FAIL] Items API failed'); print(f'[INFO] Total API routes: {len([r for r in app.routes if hasattr(r, \"path\")])}')" 2>nul
 ) else (
     echo [FAIL] requirements.txt not found
 )

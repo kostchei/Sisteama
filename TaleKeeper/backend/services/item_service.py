@@ -1,6 +1,17 @@
 """
+File: backend/services/item_service.py
+Path: /backend/services/item_service.py
+
 Item and inventory management service.
 AI Agents: Comprehensive item handling with equipment logic and stat calculations.
+
+Pseudo Code:
+1. Handle item equipping/unequipping with slot management
+2. Calculate AC and stat bonuses from equipped items
+3. Process item buying/selling with shop systems
+4. Generate random loot from monster tables
+5. Manage inventory weight and carrying capacity
+6. Apply magical item effects and properties
 """
 
 from sqlalchemy.orm import Session

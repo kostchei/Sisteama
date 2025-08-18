@@ -1,5 +1,16 @@
 /**
+ * File: frontend/src/components/CombatScreen.js
+ * Path: /frontend/src/components/CombatScreen.js
+ * 
  * Combat Screen Component
+ * 
+ * Pseudo Code:
+ * 1. Initialize combat encounter with monsters and turn order
+ * 2. Display character status, monster cards, and action interface
+ * 3. Handle player action selection and processing
+ * 4. Automatically process monster turns with AI
+ * 5. Show combat log and damage/healing animations
+ * 6. Handle combat end conditions (victory/defeat/flee)
  * 
  * AI Agents: This handles the round-by-round combat UI.
  * Key features:
@@ -10,11 +21,10 @@
  * - Turn order tracker
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GiSwordWound, GiHealing, GiRun, GiShield } from 'react-icons/gi';
-import { FaDiceD20 } from 'react-icons/fa';
+// No icon dependencies needed - using text-based interface
 import toast from 'react-hot-toast';
 import { combatAPI } from '../services/api';
 import { useGameStore } from '../services/gameStore';
@@ -43,33 +53,45 @@ const CombatScreen = () => {
     if (!combatState) {
       initializeCombat();
     }
-  }, []);
+  }, [combatState, initializeCombat]);
 
   useEffect(() => {
     // Check for combat end
     if (combatState?.outcome) {
       handleCombatEnd(combatState.outcome);
     }
-  }, [combatState?.outcome]);
+  }, [combatState?.outcome, handleCombatEnd]);
 
   useEffect(() => {
     // Auto-process monster turns
     if (combatState?.currentTurn && 
-        combatState.combatants[combatState.currentTurn]?.type === 'monster' &&
+        combatState.combatants?.[combatState.currentTurn]?.type === 'monster' &&
         combatState.is_active) {
       processMonsterTurn();
     }
-  }, [combatState?.currentTurn]);
+  }, [combatState?.combatants, combatState?.is_active, combatState?.currentTurn, processMonsterTurn]);
 
-  const initializeCombat = async () => {
+  const initializeCombat = useCallback(async () => {
     try {
       setIsProcessing(true);
       // Get current encounter from game state
-      const encounter = gameState.currentEncounter || { monsters: ['zombie'] };
+      const encounter = gameState?.currentEncounter || { monsters: ['zombie'] };
       
       const response = await combatAPI.startCombat(character.id, encounter);
       setCombatState(response.combatState);
       setCombatLog(response.combatState.log || []);
+      
+      // Update character with any combat-related changes
+      if (response.updatedCharacter) {
+        updateCharacter(response.updatedCharacter);
+      }
+      
+      // Update game state with combat status
+      updateGameState({ 
+        ...gameState, 
+        inCombat: true, 
+        currentEncounter: encounter 
+      });
       
       toast.success('Combat begins!');
     } catch (error) {
@@ -79,9 +101,9 @@ const CombatScreen = () => {
     } finally {
       setIsProcessing(false);
     }
-  };
+  }, [character.id, gameState, updateCharacter, updateGameState, navigate]);
 
-  const processMonsterTurn = async () => {
+  const processMonsterTurn = useCallback(async () => {
     // Delay for dramatic effect
     await new Promise(resolve => setTimeout(resolve, 1500));
     
@@ -108,7 +130,7 @@ const CombatScreen = () => {
     } finally {
       setIsProcessing(false);
     }
-  };
+  }, [combatState, character.id]);
 
   const handleAction = async (action) => {
     if (!action || isProcessing) return;
@@ -132,6 +154,11 @@ const CombatScreen = () => {
       setCombatState(response.combatState);
       setCombatLog(prev => [...prev, ...response.newLogEntries]);
       
+      // Update character with any changes (HP, resources, etc.)
+      if (response.updatedCharacter) {
+        updateCharacter(response.updatedCharacter);
+      }
+      
       // Handle animations and feedback
       if (response.damage && selectedTarget) {
         setLastDamageDealt({
@@ -149,8 +176,11 @@ const CombatScreen = () => {
         toast.error('Attack missed!');
       }
       
-      // Clear selections
-      setSelectedAction(null);
+      // Store the selected action for reference
+      setSelectedAction(action.id);
+      
+      // Clear selections after a delay
+      setTimeout(() => setSelectedAction(null), 1000);
       
     } catch (error) {
       console.error('Action failed:', error);
@@ -181,12 +211,12 @@ const CombatScreen = () => {
     }
   };
 
-  const handleCombatEnd = (outcome) => {
+  const handleCombatEnd = useCallback((outcome) => {
     if (outcome === 'victory') {
       toast.success('Victory! You defeated all enemies!');
-      // Navigate to post-combat options after delay
+      // Navigate to loot screen after victory
       setTimeout(() => {
-        navigate('/game', { state: { combatResult: 'victory' } });
+        navigate('/loot', { state: { combatResult: 'victory' } });
       }, 2000);
     } else if (outcome === 'defeat') {
       toast.error('You have been defeated...');
@@ -194,7 +224,7 @@ const CombatScreen = () => {
         navigate('/', { state: { gameOver: true } });
       }, 2000);
     }
-  };
+  }, [navigate]);
 
   const handleFlee = async () => {
     if (isProcessing) return;
@@ -243,7 +273,7 @@ const CombatScreen = () => {
               </span>
             </div>
             <div className="ac-display">
-              <GiShield /> AC {playerCombatant.ac}
+              AC {playerCombatant.ac}
             </div>
           </div>
           <div className="status-conditions">
@@ -311,14 +341,29 @@ const CombatScreen = () => {
           ))}
         </div>
 
-        {/* Position indicator */}
+        {/* Position indicator with icons */}
         <div className="position-indicator">
           <span className={`position-badge ${playerCombatant.position}`}>
-            {playerCombatant.position === 'melee' ? '⚔️ In Melee' : '🏹 At Range'}
+            {playerCombatant.position === 'melee' ? 'In Melee' : 'At Range'}
           </span>
+          
+          {/* Movement indicator */}
           <span className="movement-left">
-            Movement: {playerCombatant.movement}ft
+            Movement: {combatState.movement || 30}ft
           </span>
+        </div>
+
+        {/* Action status indicators */}
+        <div className="action-status">
+          <div className={`action-indicator ${combatState.has_action ? 'available' : 'used'}`}>
+            Action {combatState.has_action ? 'Available' : 'Used'}
+          </div>
+          <div className={`action-indicator ${combatState.has_bonus ? 'available' : 'used'}`}>
+            Bonus Action {combatState.has_bonus ? 'Available' : 'Used'}
+          </div>
+          <div className={`action-indicator ${combatState.has_reaction ? 'available' : 'used'}`}>
+            Reaction {combatState.has_reaction ? 'Available' : 'Used'}
+          </div>
         </div>
       </div>
 
@@ -349,7 +394,7 @@ const CombatScreen = () => {
                 onClick={handleFlee}
                 disabled={isProcessing}
               >
-                <GiRun /> Flee
+                Flee
               </button>
             </div>
           </>

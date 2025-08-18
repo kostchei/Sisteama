@@ -1,5 +1,16 @@
 """
+File: backend/main.py
+Path: /backend/main.py
+
 D&D 2024 Game Backend - Main Application
+
+Pseudo Code:
+1. Configure FastAPI app with CORS and lifecycle management
+2. Include all feature routers (character, combat, game, items)
+3. Set up error handlers and health check endpoints
+4. Initialize database on startup
+5. Run with Uvicorn server for development
+
 AI Agents: This is the entry point. Add new routers in the routers/ directory and import them here.
 """
 
@@ -127,4 +138,4 @@ async def server_error(request, exc):
 if __name__ == "__main__":
     # For local development without Docker
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

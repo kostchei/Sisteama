@@ -1,6 +1,16 @@
 """
+File: backend/models/character.py
+Path: /backend/models/character.py
+
 Character models for D&D game.
 AI Agents: Core character data with D&D 2024 rules integration.
+
+Pseudo Code:
+1. Define Character SQLAlchemy model with stats, race, class, equipment
+2. Create Pydantic schemas for API requests/responses
+3. Include calculated properties (AC, modifiers, spell save DC)
+4. Handle character progression (leveling, XP, HP increases)
+5. Manage equipment relationships and inventory tracking
 """
 
 from sqlalchemy import Column, String, Integer, Boolean, JSON, DateTime, ForeignKey, Text, Numeric

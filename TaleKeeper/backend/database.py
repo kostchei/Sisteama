@@ -1,5 +1,16 @@
 """
+File: backend/database.py
+Path: /backend/database.py
+
 Database configuration and session management.
+
+Pseudo Code:
+1. Configure SQLAlchemy engine for PostgreSQL/SQLite
+2. Create session factory with proper error handling
+3. Initialize database tables from all imported models
+4. Provide dependency injection for database sessions
+5. Include game-specific query utilities (XP calculations, modifiers)
+
 AI Agents: This handles all database connections. Add new models to Base.metadata.
 """
 

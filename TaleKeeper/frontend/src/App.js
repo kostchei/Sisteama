@@ -1,11 +1,21 @@
 /**
+ * File: frontend/src/App.js
+ * Path: /frontend/src/App.js
+ * 
  * Main D&D Game Application
+ * 
+ * Pseudo Code:
+ * 1. Set up React Router with all game screens (Main Menu, Character Creator, Combat, etc.)
+ * 2. Manage global game state with useGameStore hook
+ * 3. Handle navigation between different game phases
+ * 4. Configure toast notifications for user feedback
+ * 5. Provide authentication and character loading logic
  * 
  * AI Agents: This is the root component. Add new screens to the router.
  * Game flow: Main Menu -> Character Creation/Load -> Game -> Combat/Rest/Town
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import './styles/main.css';
@@ -18,6 +28,7 @@ import CombatScreen from './components/CombatScreen';
 import RestScreen from './components/RestScreen';
 import TownScreen from './components/TownScreen';
 import GameScreen from './components/GameScreen';
+import LootScreen from './components/LootScreen';
 
 // Import services
 import { gameAPI } from './services/api';
@@ -36,20 +47,33 @@ function App() {
   useEffect(() => {
     // Check for existing save on mount
     checkExistingSaves();
-  }, []);
+  }, [checkExistingSaves]);
 
-  const checkExistingSaves = async () => {
+  const checkExistingSaves = useCallback(async () => {
     try {
       setLoading(true);
       const saves = await gameAPI.getSaveSlots();
-      // AI Agents: Handle auto-load of last played character here
       console.log('Available saves:', saves);
+      
+      // Auto-load the most recent character if available
+      if (saves && saves.length > 0) {
+        const mostRecent = saves.reduce((latest, save) => 
+          new Date(save.last_played) > new Date(latest.last_played) ? save : latest
+        );
+        
+        // Load the character and game state
+        const loadedCharacter = await gameAPI.loadCharacter(mostRecent.character_id);
+        const loadedGameState = await gameAPI.getGameState(mostRecent.character_id);
+        
+        setCharacter(loadedCharacter);
+        setGameState(loadedGameState);
+      }
     } catch (error) {
       console.error('Error checking saves:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [setLoading, setCharacter, setGameState]);
 
   // Loading screen
   if (isLoading) {
@@ -124,6 +148,11 @@ function App() {
           {/* Character Sheet - View/Edit character */}
           <Route path="/character" element={
             character ? <CharacterSheet /> : <Navigate to="/" />
+          } />
+          
+          {/* Loot Screen - Post-combat loot pickup */}
+          <Route path="/loot" element={
+            character ? <LootScreen /> : <Navigate to="/" />
           } />
           
           {/* Catch all - redirect to main menu */}

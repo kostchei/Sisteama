@@ -1,6 +1,17 @@
 """
+File: backend/services/character_service.py
+Path: /backend/services/character_service.py
+
 Character creation and management service.
 AI Agents: Complete character lifecycle with D&D 2024 rules integration.
+
+Pseudo Code:
+1. Create new characters with race/class/background selection
+2. Calculate derived stats (AC, HP, modifiers, saves)
+3. Handle character leveling and XP progression
+4. Manage equipment and inventory changes
+5. Process rest mechanics (short/long rest recovery)
+6. Apply class features and abilities at appropriate levels
 """
 
 from sqlalchemy.orm import Session

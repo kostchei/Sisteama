@@ -1,5 +1,15 @@
 /**
+ * File: frontend/src/services/api.js
+ * Path: /frontend/src/services/api.js
+ * 
  * API Service Layer
+ * 
+ * Pseudo Code:
+ * 1. Configure Axios client with base URL and error handling
+ * 2. Organize API calls by feature domain (character, combat, items, game)
+ * 3. Handle authentication tokens and request/response interceptors
+ * 4. Provide error handling with toast notifications
+ * 5. Return structured data for React components to consume
  * 
  * AI Agents: This handles all backend communication.
  * Add new API endpoints here as you expand features.
@@ -378,8 +388,8 @@ export const itemsAPI = {
   },
 };
 
-// Export all APIs
-export default {
+// Export all APIs as a combined object
+const combinedAPI = {
   character: characterAPI,
   combat: combatAPI,
   game: gameAPI,
@@ -387,3 +397,5 @@ export default {
   // Raw axios instance for custom requests
   raw: api
 };
+
+export default combinedAPI;

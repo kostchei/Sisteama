@@ -1,6 +1,16 @@
 """
+File: backend/models/items.py
+Path: /backend/models/items.py
+
 Item and inventory models for D&D game.
 AI Agents: Comprehensive item system with equipment, consumables, and inventory tracking.
+
+Pseudo Code:
+1. Define Item model with stats, rarity, type, and magical properties
+2. Handle equipment slots and character inventory relationships
+3. Manage shop inventory with pricing and availability
+4. Create loot tables for random treasure generation
+5. Process item effects (stat bonuses, damage, healing)
 """
 
 from sqlalchemy import Column, String, Integer, Boolean, JSON, DateTime, ForeignKey, Text, Numeric, Enum as SQLEnum

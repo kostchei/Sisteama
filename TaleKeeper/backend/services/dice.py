@@ -1,6 +1,16 @@
 """
+File: backend/services/dice.py
+Path: /backend/services/dice.py
+
 Dice rolling system for D&D 2024.
 Handles all dice notation parsing and rolling with modifiers.
+
+Pseudo Code:
+1. Parse dice notation using regex (e.g., "2d6+3", "1d20")
+2. Roll individual dice with random number generation
+3. Apply advantage/disadvantage by rolling twice and taking best/worst
+4. Handle complex expressions with multiple dice types
+5. Return detailed results with individual rolls and totals
 
 AI Agents: Supported formats:
 - Simple: "1d20", "2d6", "3d4"

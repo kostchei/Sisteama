@@ -1,6 +1,17 @@
 """
+File: backend/services/combat_engine.py
+Path: /backend/services/combat_engine.py
+
 D&D 2024 Combat Engine
 Handles all combat mechanics including initiative, actions, damage, and conditions.
+
+Pseudo Code:
+1. Initialize combat encounter with initiative rolls and turn order
+2. Process player and monster actions (attacks, spells, movement)
+3. Calculate damage, apply resistance/immunity, update HP
+4. Handle status conditions (poisoned, stunned, etc.)
+5. Check for combat end conditions (victory/defeat)
+6. Manage turn progression and action economy
 
 AI Agents: This is the core combat system. Key methods:
 - start_combat(): Initialize encounter

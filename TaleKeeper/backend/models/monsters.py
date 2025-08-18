@@ -1,6 +1,16 @@
 """
+File: backend/models/monsters.py
+Path: /backend/models/monsters.py
+
 Monster models for D&D game.
 AI Agents: Combat encounters with full stat blocks and AI behavior patterns.
+
+Pseudo Code:
+1. Define Monster model with complete D&D stat block (HP, AC, stats, saves)
+2. Store AI behavior scripts for different monster types
+3. Handle special abilities, attacks, and spellcasting
+4. Manage encounter difficulty and challenge rating
+5. Process monster actions during combat turns
 """
 
 from sqlalchemy import Column, String, Integer, Boolean, JSON, DateTime, ForeignKey, Text, Numeric

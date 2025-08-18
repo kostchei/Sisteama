@@ -1,5 +1,15 @@
 /**
+ * File: frontend/src/components/ActionCard.js
+ * Path: /frontend/src/components/ActionCard.js
+ * 
  * Action Cards Component
+ * 
+ * Pseudo Code:
+ * 1. Display available combat actions as interactive cards
+ * 2. Handle card flipping animations when actions are used
+ * 3. Color-code cards by action type (Action/Bonus/Reaction/Movement)
+ * 4. Disable cards when not player's turn or action unavailable
+ * 5. Trigger action callbacks when cards are clicked
  * 
  * AI Agents: This displays available actions as cards that flip when used.
  * Cards are color-coded:
@@ -11,16 +21,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  GiSwordWound, 
-  GiHealing, 
-  GiShield, 
-  GiRun,
-  GiPocketBow,
-  GiDagger,
-  GiHealthPotion
-} from 'react-icons/gi';
-import { FaDiceD20 } from 'react-icons/fa';
+// No icon dependencies - using text-based interface
 import '../styles/actionCards.css';
 
 const ActionCards = ({ character, combatState, onSelectAction, disabled }) => {
@@ -44,7 +45,6 @@ const ActionCards = ({ character, combatState, onSelectAction, disabled }) => {
           id: 'main_attack',
           name: `Attack with ${character.equipment.mainHand.name}`,
           type: 'action',
-          icon: <GiSwordWound />,
           description: `${character.equipment.mainHand.damage} + ${character.strMod}`,
           requiresTarget: true,
           attack: true,
@@ -59,7 +59,6 @@ const ActionCards = ({ character, combatState, onSelectAction, disabled }) => {
           id: 'unarmed',
           name: 'Unarmed Strike',
           type: 'action',
-          icon: <GiSwordWound />,
           description: `1 + ${character.strMod} bludgeoning`,
           requiresTarget: true,
           attack: true,
@@ -78,8 +77,7 @@ const ActionCards = ({ character, combatState, onSelectAction, disabled }) => {
             id: 'second_wind',
             name: 'Second Wind',
             type: 'action',
-            icon: <GiHealing />,
-            description: `Heal 1d10+${character.level}`,
+              description: `Heal 1d10+${character.level}`,
             requiresTarget: false,
             special: true,
             heal: `1d10+${character.level}`
@@ -92,8 +90,7 @@ const ActionCards = ({ character, combatState, onSelectAction, disabled }) => {
             id: 'action_surge',
             name: 'Action Surge',
             type: 'action',
-            icon: <GiShield />,
-            description: 'Gain an additional action this turn',
+              description: 'Gain an additional action this turn',
             requiresTarget: false,
             special: true
           });
@@ -106,7 +103,6 @@ const ActionCards = ({ character, combatState, onSelectAction, disabled }) => {
           id: 'potion_healing',
           name: 'Healing Potion',
           type: 'action',
-          icon: <GiHealthPotion />,
           description: 'Heal 2d4+2 HP',
           requiresTarget: false,
           heal: '2d4+2',
@@ -123,7 +119,6 @@ const ActionCards = ({ character, combatState, onSelectAction, disabled }) => {
           id: 'cunning_dash',
           name: 'Cunning Action: Dash',
           type: 'bonus_action',
-          icon: <GiRun />,
           description: 'Double your movement',
           requiresTarget: false,
           special: true,
@@ -134,7 +129,6 @@ const ActionCards = ({ character, combatState, onSelectAction, disabled }) => {
           id: 'cunning_disengage',
           name: 'Cunning Action: Disengage',
           type: 'bonus_action',
-          icon: <GiShield />,
           description: 'Move without provoking attacks',
           requiresTarget: false,
           special: true,
@@ -145,7 +139,6 @@ const ActionCards = ({ character, combatState, onSelectAction, disabled }) => {
           id: 'cunning_hide',
           name: 'Cunning Action: Hide',
           type: 'bonus_action',
-          icon: <GiDagger />,
           description: 'Attempt to hide',
           requiresTarget: false,
           special: true,
@@ -159,7 +152,6 @@ const ActionCards = ({ character, combatState, onSelectAction, disabled }) => {
           id: 'offhand_attack',
           name: `Off-hand: ${character.equipment.offHand.name}`,
           type: 'bonus_action',
-          icon: <GiDagger />,
           description: `${character.equipment.offHand.damage} (no modifier)`,
           requiresTarget: true,
           attack: true,
@@ -192,7 +184,6 @@ const ActionCards = ({ character, combatState, onSelectAction, disabled }) => {
           id: 'move_melee',
           name: 'Move to Melee',
           type: 'movement',
-          icon: <GiRun />,
           description: 'Engage in close combat (15ft)',
           requiresTarget: false,
           position: 'melee'
@@ -202,7 +193,6 @@ const ActionCards = ({ character, combatState, onSelectAction, disabled }) => {
           id: 'move_ranged',
           name: 'Move to Range',
           type: 'movement',
-          icon: <GiPocketBow />,
           description: 'Back away from melee (15ft)',
           requiresTarget: false,
           position: 'ranged'
@@ -253,7 +243,6 @@ const ActionCards = ({ character, combatState, onSelectAction, disabled }) => {
         }}
       >
         <div className="card-front">
-          <div className="card-icon">{action.icon}</div>
           <div className="card-name">{action.name}</div>
           <div className="card-description">{action.description}</div>
           {action.requiresTarget && (
@@ -310,7 +299,6 @@ const ActionCards = ({ character, combatState, onSelectAction, disabled }) => {
             {availableActions.reactions.map(action => (
               <div key={action.id} className="action-card yellow disabled">
                 <div className="card-front">
-                  <div className="card-icon">{action.icon}</div>
                   <div className="card-name">{action.name}</div>
                   <div className="card-description">{action.description}</div>
                   <div className="card-trigger">Trigger: {action.trigger}</div>
