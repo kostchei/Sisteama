@@ -122,6 +122,17 @@ const CharacterCreator = () => {
                     Dwarf
                   </button>
                 </div>
+                {characterData.race && (
+                  <div className="selection-feedback">
+                    <p>✓ Selected: <strong>{characterData.race}</strong></p>
+                    <p className="race-description">
+                      {characterData.race === 'Human' ? 
+                        'Versatile and ambitious, humans adapt quickly to any situation.' :
+                        'Sturdy and resilient, dwarves are known for their craftsmanship and courage.'
+                      }
+                    </p>
+                  </div>
+                )}
               </div>
             )}
             
@@ -142,6 +153,17 @@ const CharacterCreator = () => {
                     Rogue
                   </button>
                 </div>
+                {characterData.characterClass && (
+                  <div className="selection-feedback">
+                    <p>✓ Selected: <strong>{characterData.characterClass}</strong></p>
+                    <p className="class-description">
+                      {characterData.characterClass === 'Fighter' ? 
+                        'Masters of martial combat, skilled with a variety of weapons and armor.' :
+                        'Skilled in stealth and precision, rogues excel at striking from the shadows.'
+                      }
+                    </p>
+                  </div>
+                )}
               </div>
             )}
             
@@ -149,13 +171,30 @@ const CharacterCreator = () => {
               <div>
                 <h2>Choose Background</h2>
                 <div className="option-grid">
-                  <button onClick={() => setCharacterData({...characterData, background: 'Farmer'})}>
+                  <button 
+                    className={characterData.background === 'Farmer' ? 'selected' : ''}
+                    onClick={() => setCharacterData({...characterData, background: 'Farmer'})}
+                  >
                     Farmer
                   </button>
-                  <button onClick={() => setCharacterData({...characterData, background: 'Soldier'})}>
+                  <button 
+                    className={characterData.background === 'Soldier' ? 'selected' : ''}
+                    onClick={() => setCharacterData({...characterData, background: 'Soldier'})}
+                  >
                     Soldier
                   </button>
                 </div>
+                {characterData.background && (
+                  <div className="selection-feedback">
+                    <p>✓ Selected: <strong>{characterData.background}</strong></p>
+                    <p className="background-description">
+                      {characterData.background === 'Farmer' ? 
+                        'You worked the land, understanding nature and hard work.' :
+                        'You served in a military organization, trained in tactics and discipline.'
+                      }
+                    </p>
+                  </div>
+                )}
               </div>
             )}
             
