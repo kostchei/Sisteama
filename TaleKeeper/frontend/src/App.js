@@ -44,11 +44,6 @@ function App() {
     setLoading 
   } = useGameStore();
 
-  useEffect(() => {
-    // Check for existing save on mount
-    checkExistingSaves();
-  }, [checkExistingSaves]);
-
   const checkExistingSaves = useCallback(async () => {
     try {
       setLoading(true);
@@ -74,6 +69,11 @@ function App() {
       setLoading(false);
     }
   }, [setLoading, setCharacter, setGameState]);
+
+  useEffect(() => {
+    // Check for existing save on mount
+    checkExistingSaves();
+  }, [checkExistingSaves]);
 
   // Loading screen
   if (isLoading) {

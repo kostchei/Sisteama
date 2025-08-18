@@ -60,9 +60,16 @@ const LootScreen = () => {
       setIsLooting(true);
       
       // Add items to character inventory
+      let updatedCharacter = { ...character };
       for (const item of selectedItems) {
-        await gameAPI.addItemToInventory(character.id, item);
+        const result = await gameAPI.addItemToInventory(character.id, item);
+        if (result.updatedCharacter) {
+          updatedCharacter = result.updatedCharacter;
+        }
       }
+      
+      // Update character state with new inventory
+      updateCharacter(updatedCharacter);
       
       // Remove taken items from available loot
       const remainingLoot = availableLoot.filter(

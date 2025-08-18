@@ -24,7 +24,7 @@ const MainMenu = () => {
 
   const handleNewGame = () => {
     setCurrentScreen('character-creator');
-    navigate('/character-creator');
+    navigate('/create-character');
   };
 
   const handleLoadGame = () => {

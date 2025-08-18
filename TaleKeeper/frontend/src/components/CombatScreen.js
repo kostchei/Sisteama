@@ -48,29 +48,7 @@ const CombatScreen = () => {
   const [lastDamageDealt, setLastDamageDealt] = useState({});
   const [lastHeal, setLastHeal] = useState({});
 
-  useEffect(() => {
-    // Initialize combat if not already started
-    if (!combatState) {
-      initializeCombat();
-    }
-  }, [combatState, initializeCombat]);
-
-  useEffect(() => {
-    // Check for combat end
-    if (combatState?.outcome) {
-      handleCombatEnd(combatState.outcome);
-    }
-  }, [combatState?.outcome, handleCombatEnd]);
-
-  useEffect(() => {
-    // Auto-process monster turns
-    if (combatState?.currentTurn && 
-        combatState.combatants?.[combatState.currentTurn]?.type === 'monster' &&
-        combatState.is_active) {
-      processMonsterTurn();
-    }
-  }, [combatState?.combatants, combatState?.is_active, combatState?.currentTurn, processMonsterTurn]);
-
+  // Define callback functions first
   const initializeCombat = useCallback(async () => {
     try {
       setIsProcessing(true);
@@ -103,6 +81,21 @@ const CombatScreen = () => {
     }
   }, [character.id, gameState, updateCharacter, updateGameState, navigate]);
 
+  const handleCombatEnd = useCallback((outcome) => {
+    if (outcome === 'victory') {
+      toast.success('Victory! You defeated all enemies!');
+      // Navigate to loot screen after victory
+      setTimeout(() => {
+        navigate('/loot', { state: { combatResult: 'victory' } });
+      }, 2000);
+    } else if (outcome === 'defeat') {
+      toast.error('You have been defeated...');
+      setTimeout(() => {
+        navigate('/', { state: { gameOver: true } });
+      }, 2000);
+    }
+  }, [navigate]);
+
   const processMonsterTurn = useCallback(async () => {
     // Delay for dramatic effect
     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -131,6 +124,30 @@ const CombatScreen = () => {
       setIsProcessing(false);
     }
   }, [combatState, character.id]);
+
+  // useEffect hooks after all callback definitions
+  useEffect(() => {
+    // Initialize combat if not already started
+    if (!combatState) {
+      initializeCombat();
+    }
+  }, [combatState, initializeCombat]);
+
+  useEffect(() => {
+    // Check for combat end
+    if (combatState?.outcome) {
+      handleCombatEnd(combatState.outcome);
+    }
+  }, [combatState?.outcome, handleCombatEnd]);
+
+  useEffect(() => {
+    // Auto-process monster turns
+    if (combatState?.currentTurn && 
+        combatState.combatants?.[combatState.currentTurn]?.type === 'monster' &&
+        combatState.is_active) {
+      processMonsterTurn();
+    }
+  }, [combatState?.combatants, combatState?.is_active, combatState?.currentTurn, processMonsterTurn]);
 
   const handleAction = async (action) => {
     if (!action || isProcessing) return;
@@ -210,21 +227,6 @@ const CombatScreen = () => {
       setIsProcessing(false);
     }
   };
-
-  const handleCombatEnd = useCallback((outcome) => {
-    if (outcome === 'victory') {
-      toast.success('Victory! You defeated all enemies!');
-      // Navigate to loot screen after victory
-      setTimeout(() => {
-        navigate('/loot', { state: { combatResult: 'victory' } });
-      }, 2000);
-    } else if (outcome === 'defeat') {
-      toast.error('You have been defeated...');
-      setTimeout(() => {
-        navigate('/', { state: { gameOver: true } });
-      }, 2000);
-    }
-  }, [navigate]);
 
   const handleFlee = async () => {
     if (isProcessing) return;
@@ -377,6 +379,7 @@ const CombatScreen = () => {
             <ActionCards
               character={character}
               combatState={playerCombatant}
+              selectedAction={selectedAction}
               onSelectAction={handleAction}
               disabled={isProcessing}
             />

@@ -24,7 +24,7 @@ import { motion } from 'framer-motion';
 // No icon dependencies - using text-based interface
 import '../styles/actionCards.css';
 
-const ActionCards = ({ character, combatState, onSelectAction, disabled }) => {
+const ActionCards = ({ character, combatState, selectedAction, onSelectAction, disabled }) => {
   const [flippedCards, setFlippedCards] = useState({});
   const [selectedCard, setSelectedCard] = useState(null);
 
@@ -169,7 +169,6 @@ const ActionCards = ({ character, combatState, onSelectAction, disabled }) => {
         id: 'opportunity_attack',
         name: 'Opportunity Attack',
         type: 'reaction',
-        icon: <GiSwordWound />,
         description: 'Attack when enemy leaves your reach',
         requiresTarget: true,
         attack: true,
@@ -223,7 +222,7 @@ const ActionCards = ({ character, combatState, onSelectAction, disabled }) => {
 
   const renderCard = (action, color) => {
     const isFlipped = flippedCards[action.id];
-    const isSelected = selectedCard === action.id;
+    const isSelected = selectedAction === action.id || selectedCard === action.id;
 
     return (
       <motion.div
