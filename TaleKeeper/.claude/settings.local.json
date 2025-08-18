@@ -8,7 +8,8 @@
       "Bash(docker:*)",
       "Bash(psql:*)",
       "Bash(where docker)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

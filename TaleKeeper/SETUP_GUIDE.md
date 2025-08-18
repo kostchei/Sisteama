@@ -102,17 +102,19 @@ After startup, access the game at:
 ## 🎯 Testing the Setup
 
 ### Automatic Tests
-Run the test script to verify everything works:
+The startup script includes built-in diagnostics, or run comprehensive testing:
 ```bash
-test-setup.bat
+start-game.bat
+# Select option 4: Run Full Diagnostics
 ```
 
 This will check:
-- ✅ Python/Node installation
-- ✅ Dependency installation 
-- ✅ Database connection
-- ✅ Backend health check
-- ✅ API endpoints
+- ✅ Python/Node installation with version details
+- ✅ Dependency installation and verification
+- ✅ Database connection and API testing
+- ✅ Docker configuration and build testing
+- ✅ Port availability checking
+- ✅ File system structure validation
 
 ### Manual Verification
 
@@ -224,9 +226,8 @@ docker-compose logs -f
 
 ```
 TaleKeeper/
-├── start-game.bat          # Single-command startup
-├── test-setup.bat          # Setup verification
-├── fix-docker.bat          # Docker cleanup utility
+├── start-game.bat          # Single-command startup with diagnostics
+├── fix-docker.bat          # Docker cleanup utility  
 ├── docker-compose.yml      # Docker configuration
 ├── .env                    # Environment variables
 ├── backend/               
@@ -258,7 +259,7 @@ TaleKeeper/
 
 If you encounter issues:
 
-1. Run `test-setup.bat` to diagnose problems
+1. Run `start-game.bat` → Option 4 (Full Diagnostics) to identify problems
 2. Check this troubleshooting guide
 3. Look for error messages in the console
 4. Try the "Reset Everything" steps
