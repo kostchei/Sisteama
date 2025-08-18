@@ -343,6 +343,51 @@ dnd-game/
     └── init.sql         # Initial schema + sample data
 ```
 
+## 🎲 **CUSTOM ABILITY SCORE SYSTEM**
+
+### **Two-Phase Character Generation**
+
+#### **Phase 1: Strategic Allocation**
+Players allocate three prime values (15, 14, 13) to their class's key abilities:
+
+**Fighter:**
+- Allocates 15, 14, 13 to: (STR or DEX choice) + CON + one additional choice
+- Minimum stats: WIS 6, CHA 6, INT 3
+- Unallocated stats default to 8
+
+**Rogue:**
+- Allocates 15, 14, 13 to: DEX + (INT or CHA choice) + one additional choice
+- Minimum stats: CON 6, STR 6, WIS 3
+- Unallocated stats default to 8
+
+#### **Phase 2: Enhancement Rolls**
+```
+Roll 4d6, drop lowest, six times in ability order (STR→DEX→CON→INT→WIS→CHA)
+Final ability score = MAX(allocated/minimum value, rolled value)
+```
+
+#### **Example: Fighter Creation**
+```
+Allocation Phase:
+STR: 15 (primary), DEX: 8, CON: 14 (required), INT: 3 (min), WIS: 6 (min), CHA: 13 (choice)
+
+Roll Phase:
+Rolled: [12, 16, 10, 15, 4, 9]
+
+Final Stats:
+STR: max(15, 12) = 15  ✓ Keeps allocation
+DEX: max(8, 16) = 16   ✓ Roll improves default  
+CON: max(14, 10) = 14  ✓ Keeps allocation
+INT: max(3, 15) = 15   ✓ Roll dramatically improves minimum
+WIS: max(6, 4) = 6     ✓ Keeps minimum (roll too low)
+CHA: max(13, 9) = 13   ✓ Keeps allocation
+```
+
+This system ensures:
+- Class viability (good scores in key abilities)
+- Character uniqueness (rolls can create unexpected strengths)
+- No stat degradation (rolls only improve, never worsen)
+
 **Ready to build?**
 
 ✅ **YES** - Start building  

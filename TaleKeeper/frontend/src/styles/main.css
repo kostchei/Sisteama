@@ -658,3 +658,305 @@ textarea:disabled {
 .character-summary strong {
   color: var(--color-success);
 }
+
+/* ========================================
+   Character Sheet (Ability Score Allocation)
+   ======================================== */
+
+.character-sheet {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+  padding: var(--spacing-xl);
+  color: var(--text-primary);
+}
+
+.sheet-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.character-header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: var(--spacing-lg);
+}
+
+.character-header h1 {
+  color: var(--color-success);
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.character-basics {
+  display: flex;
+  gap: var(--spacing-lg);
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+}
+
+.character-basics span {
+  background: var(--bg-secondary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.allocation-phase h2,
+.roll-confirmation h2,
+.final-stats h2 {
+  color: var(--color-success);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.phase-instructions {
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid var(--color-success);
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.allocation-grid {
+  margin-bottom: var(--spacing-xl);
+}
+
+.ability-row {
+  display: grid;
+  grid-template-columns: 80px 80px 100px 1fr;
+  gap: var(--spacing-md);
+  align-items: center;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.ability-name {
+  font-weight: bold;
+  color: var(--color-success);
+  font-size: 1.1rem;
+}
+
+.ability-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.ability-modifier {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.allocation-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.allocation-btn {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: bold;
+  min-width: 40px;
+}
+
+.allocation-btn:hover:not(:disabled) {
+  border-color: var(--color-success);
+  background: var(--bg-secondary);
+}
+
+.allocation-btn.selected {
+  border-color: var(--color-success);
+  background: rgba(74, 222, 128, 0.2);
+  color: var(--color-success);
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+}
+
+.allocation-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.minimum-note {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.allocation-status {
+  text-align: center;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: var(--spacing-lg);
+}
+
+.allocation-status p {
+  margin-bottom: var(--spacing-md);
+  color: var(--text-secondary);
+}
+
+.phase-btn,
+.roll-btn,
+.finalize-btn {
+  background: var(--color-success);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.phase-btn:hover:not(:disabled),
+.roll-btn:hover:not(:disabled),
+.finalize-btn:hover:not(:disabled) {
+  background: #22c55e;
+  transform: translateY(-2px);
+}
+
+.phase-btn:disabled,
+.roll-btn:disabled {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.roll-confirmation {
+  text-align: center;
+}
+
+.current-allocations {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: var(--spacing-lg);
+  margin: var(--spacing-lg) 0;
+}
+
+.current-allocations h3 {
+  color: var(--color-success);
+  margin-bottom: var(--spacing-md);
+}
+
+.allocation-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+}
+
+.stats-comparison {
+  margin-bottom: var(--spacing-xl);
+}
+
+.stat-comparison {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--border-color);
+}
+
+.stat-comparison .ability-name {
+  font-size: 1.2rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--spacing-md);
+  text-align: center;
+}
+
+.allocated {
+  color: var(--text-secondary);
+}
+
+.rolled {
+  color: var(--color-info);
+}
+
+.final {
+  color: var(--text-primary);
+  font-weight: bold;
+}
+
+.final.improved {
+  color: var(--color-success);
+}
+
+.derived-stats {
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid var(--color-success);
+  border-radius: 8px;
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.derived-stats h3 {
+  color: var(--color-success);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+}
+
+.derived-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+  text-align: center;
+}
+
+.derived-grid div {
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  padding: var(--spacing-md);
+  color: var(--text-primary);
+  font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .ability-row {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: var(--spacing-sm);
+  }
+  
+  .character-basics {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .comparison {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+  
+  .derived-grid {
+    grid-template-columns: 1fr;
+  }
+}

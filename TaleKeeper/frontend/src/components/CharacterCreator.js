@@ -53,8 +53,8 @@ const CharacterCreator = () => {
       });
       
       setCharacter(createdCharacter);
-      setCurrentScreen('game');
-      navigate('/game');
+      setCurrentScreen('character-sheet');
+      navigate('/character');
     } catch (error) {
       console.error('Character creation failed:', error);
       
@@ -78,8 +78,8 @@ const CharacterCreator = () => {
       };
       
       setCharacter(mockCharacter);
-      setCurrentScreen('game');
-      navigate('/game');
+      setCurrentScreen('character-sheet');
+      navigate('/character');
     }
   };
 
