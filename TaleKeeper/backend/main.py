@@ -132,7 +132,7 @@ async def not_found(request, exc):
 @app.exception_handler(500)
 async def server_error(request, exc):
     """Custom 500 handler"""
-    logger.error(f"Server error on {request.url.path}: {exc}")
+    logger.error(f"Server error on {request.url.path}: {str(exc)}")
     return {"error": "Internal server error", "message": "Check server logs for details"}
 
 if __name__ == "__main__":

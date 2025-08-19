@@ -5,20 +5,19 @@ Path: /backend/database.py
 Database configuration and session management.
 
 Pseudo Code:
-1. Configure SQLAlchemy engine for PostgreSQL/SQLite
+1. Configure SQLAlchemy engine for PostgreSQL
 2. Create session factory with proper error handling
 3. Initialize database tables from all imported models
 4. Provide dependency injection for database sessions
 5. Include game-specific query utilities (XP calculations, modifiers)
 
-AI Agents: This handles all database connections. Add new models to Base.metadata.
+AI Agents: This handles all database connections. Uses PostgreSQL for all environments.
 """
 
 import os
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy.pool import StaticPool
 from typing import Generator
 from loguru import logger
 from dotenv import load_dotenv
@@ -32,24 +31,15 @@ DATABASE_URL = os.getenv(
     "postgresql://dnd_admin:password@localhost:5432/dnd_game"
 )
 
-# Configure SQLAlchemy engine
+# Configure SQLAlchemy engine for PostgreSQL
 # AI Agents: Adjust pool settings for production load
-if "sqlite" in DATABASE_URL:
-    # SQLite for testing
-    engine = create_engine(
-        DATABASE_URL,
-        connect_args={"check_same_thread": False},
-        poolclass=StaticPool,
-    )
-else:
-    # PostgreSQL for production
-    engine = create_engine(
-        DATABASE_URL,
-        pool_size=20,  # Number of persistent connections
-        max_overflow=40,  # Maximum overflow connections
-        pool_pre_ping=True,  # Test connections before using
-        echo=False,  # Set to True for SQL debugging
-    )
+engine = create_engine(
+    DATABASE_URL,
+    pool_size=20,  # Number of persistent connections
+    max_overflow=40,  # Maximum overflow connections
+    pool_pre_ping=True,  # Test connections before using
+    echo=False,  # Set to True for SQL debugging
+)
 
 # Create session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

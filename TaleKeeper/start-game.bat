@@ -81,9 +81,9 @@ if exist frontend\package.json (
 
 echo.
 echo Choose startup option:
-echo 1. Start with Docker (Full stack with PostgreSQL)
-echo 2. Start Local Development (SQLite + direct Python/Node)
-echo 3. Backend Only (API server only)
+echo 1. Start Full Stack (Docker with PostgreSQL - Recommended)
+echo 2. Start Development Mode (Docker database + local servers)
+echo 3. Backend Only (API server only - requires database)
 echo 4. Run Full Diagnostics (Advanced testing)
 echo 5. Exit
 echo.
@@ -100,20 +100,34 @@ echo Invalid choice. Defaulting to local development.
 :local_start
 echo.
 echo =========================================
-echo   Starting Local Development Mode
+echo   Starting Development Mode
 echo =========================================
 echo.
 
-REM Ensure we're using SQLite in .env
-echo [INFO] Configuring for SQLite database...
-echo [INFO] Creating .env file for local development...
+REM Start database only in Docker, run servers locally
+echo [INFO] Configuring for PostgreSQL database in Docker...
+echo [INFO] Creating .env file for development mode...
 (
     echo POSTGRES_DB=dnd_game
     echo POSTGRES_USER=dnd_admin
     echo POSTGRES_PASSWORD=secure_password_change_me
-    echo DATABASE_URL=sqlite:///./talekeeper.db
+    echo DATABASE_URL=postgresql://dnd_admin:secure_password_change_me@localhost:5432/dnd_game
     echo REACT_APP_API_URL=http://localhost:8000
 ) > .env
+
+REM Start just the database container
+echo [INFO] Starting PostgreSQL database container...
+docker-compose up -d db
+if %errorlevel% neq 0 (
+    echo [ERROR] Failed to start database container
+    echo Try running: docker-compose down -v
+    pause
+    exit /b 1
+)
+
+REM Wait for database to be ready
+echo [INFO] Waiting for database to be ready...
+timeout /t 5 /nobreak >nul
 
 REM Install backend dependencies
 echo [INFO] Installing backend dependencies...
@@ -136,11 +150,12 @@ if %errorlevel% neq 0 (
 
 echo [OK] Backend dependencies installed
 
-REM Test database setup
-echo [INFO] Setting up database...
-python -c "from database import init_db; init_db(); print('[OK] Database initialized')"
+REM Test database connection and setup
+echo [INFO] Setting up database tables...
+python -c "from database import init_db, test_connection; print('[OK] Database connected') if test_connection() else exit(1); init_db(); print('[OK] Database initialized')"
 if %errorlevel% neq 0 (
-    echo [ERROR] Database setup failed
+    echo [ERROR] Database setup failed - is PostgreSQL container running?
+    echo [INFO] You can check with: docker-compose logs db
     pause
     exit /b 1
 )
@@ -173,23 +188,28 @@ echo [INFO] Backend server is starting in separate window...
 timeout /t 3 /nobreak >nul
 echo [INFO] Backend should be available at http://localhost:8000
 
-REM Start frontend
+REM Start frontend in separate window
 echo [INFO] Starting frontend...
 cd ..\frontend
+start "TaleKeeper Frontend" cmd /k "npm start"
+
 echo.
 echo =========================================
-echo   Game is starting!
+echo   Development Mode Started!
 echo =========================================
 echo.
+echo Database: PostgreSQL in Docker (port 5432)
 echo Backend API: http://localhost:8000
-echo API Documentation: http://localhost:8000/docs
+echo API Documentation: http://localhost:8000/docs  
 echo Frontend: http://localhost:3000
 echo.
+echo Both servers are starting in separate windows...
 echo The game will open in your browser shortly...
-echo Press Ctrl+C in either window to stop the servers.
 echo.
-
-npm start
+echo To stop:
+echo - Press Ctrl+C in server windows to stop backend/frontend
+echo - Run: docker-compose stop db  (to stop database)
+echo - Or: docker-compose down  (to stop and remove containers)
 
 goto end
 
@@ -242,16 +262,25 @@ echo     Starting Backend Only
 echo =========================================
 echo.
 
-REM Use SQLite for backend only mode
-echo [INFO] Configuring for SQLite database...
+REM Use PostgreSQL - ensure database is running
+echo [INFO] Configuring for PostgreSQL database...
 if not exist .env (
     (
         echo POSTGRES_DB=dnd_game
         echo POSTGRES_USER=dnd_admin
         echo POSTGRES_PASSWORD=secure_password_change_me
-        echo DATABASE_URL=sqlite:///./talekeeper.db
+        echo DATABASE_URL=postgresql://dnd_admin:secure_password_change_me@localhost:5432/dnd_game
         echo REACT_APP_API_URL=http://localhost:8000
     ) > .env
+)
+
+echo [INFO] Checking if database is running...
+docker-compose ps db 2>nul | findstr "Up" >nul
+if %errorlevel% neq 0 (
+    echo [WARN] Database container not running. Starting database...
+    docker-compose up -d db
+    echo [INFO] Waiting for database...
+    timeout /t 5 /nobreak >nul
 )
 
 cd backend
@@ -267,6 +296,10 @@ echo.
 echo Backend API: http://localhost:8000
 echo API Documentation: http://localhost:8000/docs
 echo Health Check: http://localhost:8000/health
+echo Database: PostgreSQL in Docker (port 5432)
+echo.
+echo Press Ctrl+C to stop the backend server
+echo To stop database: docker-compose stop db
 echo.
 
 python main.py

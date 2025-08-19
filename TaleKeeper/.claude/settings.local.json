@@ -19,7 +19,8 @@
       "Bash(wsl:*)",
       "Bash(msiexec:*)",
       "Bash(\"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe\" --version)",
-      "Bash(\"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe\" ps)"
+      "Bash(\"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe\" ps)",
+      "Bash(timeout:*)"
     ],
     "deny": []
   }

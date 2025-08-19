@@ -215,7 +215,7 @@ export const gameAPI = {
    * Get all save slots
    */
   getSaveSlots: async () => {
-    const response = await api.get('/api/game/saves');
+    const response = await api.get('/api/game/save-slots');
     return response.data;
   },
 
@@ -224,7 +224,7 @@ export const gameAPI = {
    * @param {number} slotNumber - Save slot number (1-10)
    */
   loadSave: async (slotNumber) => {
-    const response = await api.get(`/api/game/saves/${slotNumber}`);
+    const response = await api.get(`/api/game/load/${slotNumber}`);
     return response.data;
   },
 
@@ -232,22 +232,27 @@ export const gameAPI = {
    * Save game to slot
    * @param {number} slotNumber - Save slot number (1-10)
    * @param {string} characterId - Character UUID
+   * @param {string} saveName - Optional save name
+   * @param {boolean} overwrite - Whether to overwrite existing save
    */
-  saveGame: async (slotNumber, characterId) => {
-    const response = await api.post(`/api/game/saves/${slotNumber}`, {
-      character_id: characterId
+  saveGame: async (slotNumber, characterId, saveName = null, overwrite = false) => {
+    const response = await api.post('/api/game/save', {
+      slot_number: slotNumber,
+      character_id: characterId,
+      save_name: saveName,
+      overwrite: overwrite
     });
     return response.data;
   },
 
   /**
-   * Delete a save slot
+   * Delete a save slot (TODO: Not implemented in backend yet)
    * @param {number} slotNumber - Save slot number (1-10)
    */
-  deleteSave: async (slotNumber) => {
-    const response = await api.delete(`/api/game/saves/${slotNumber}`);
-    return response.data;
-  },
+  // deleteSave: async (slotNumber) => {
+  //   const response = await api.delete(`/api/game/save/${slotNumber}`);
+  //   return response.data;
+  // },
 
   /**
    * Get next encounter

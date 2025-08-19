@@ -74,9 +74,8 @@ async def get_classes(db: Session = Depends(get_db)):
                 "name": cls.name,
                 "hit_die": cls.hit_die,
                 "primary_ability": cls.primary_ability,
-                "saving_throws": cls.saving_throws,
-                "skill_count": cls.skill_count,
-                "skill_options": cls.skill_options,
+                "saving_throws": cls.saving_throw_proficiencies,
+                "skill_proficiencies": cls.skill_proficiencies,
                 "starting_equipment": cls.starting_equipment,
                 "features_by_level": cls.features_by_level
             }

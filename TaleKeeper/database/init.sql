@@ -47,9 +47,22 @@ CREATE TABLE classes (
     tool_proficiencies VARCHAR[], -- ["thieves_tools"]
     skill_proficiencies JSONB, -- {"choose": 2, "from": ["Athletics", "Perception"]}
     starting_equipment JSONB, -- Detailed equipment choices
+    starting_gold VARCHAR(20) DEFAULT '2d4 * 10', -- Starting gold dice expression
     features_by_level JSONB, -- Level-based features
-    -- Expansion fields:
+    -- Spellcasting properties
+    is_spellcaster BOOLEAN DEFAULT FALSE,
+    spellcasting_ability VARCHAR(20), -- "intelligence", "wisdom", "charisma" 
+    spellcasting_type VARCHAR(20), -- "full", "half", "third", "pact"
+    ritual_casting BOOLEAN DEFAULT FALSE,
+    spellcasting_focus VARCHAR(50), -- "arcane focus", "holy symbol"
     spell_slots_by_level JSONB, -- For spellcasting classes
+    -- Subclass properties
+    subclass_level INTEGER DEFAULT 3,
+    subclass_name VARCHAR(50) DEFAULT 'Subclass',
+    -- Multiclassing
+    multiclass_requirements JSONB DEFAULT '{}',
+    -- Metadata
+    source_book VARCHAR(100) DEFAULT 'Player''s Handbook 2024',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON TABLE classes IS 'Character classes with progression. AI agents: Use features_by_level for class abilities';
@@ -74,18 +87,29 @@ CREATE TABLE backgrounds (
     -- D&D 2024: Backgrounds provide ability score increases
     ability_score_increases JSONB NOT NULL, -- {"choice": 2, "any": 1} or {"strength": 2, "wisdom": 1}
     skill_proficiencies VARCHAR[], -- ["Animal Handling", "Survival"]
-    tool_proficiencies VARCHAR[], -- ["Herbalism Kit"]
+    tool_proficiencies VARCHAR[], -- ["Herbalism Kit"] 
+    language_proficiencies VARCHAR[], -- ["Dwarvish", "Giant"] - languages gained
     languages INTEGER DEFAULT 0, -- Number of bonus languages
-    equipment JSONB, -- Starting equipment from background
+    starting_equipment JSONB, -- Starting equipment from background
     starting_gold VARCHAR(20) DEFAULT '2d4 * 10', -- Alternative to equipment
     feature_name VARCHAR(100), -- "Rustic Hospitality"
     feature_description TEXT,
-    -- Expansion fields:
+    -- D&D 2024 roleplay elements:
+    suggested_personality_traits JSONB DEFAULT '[]', 
+    suggested_ideals JSONB DEFAULT '[]',
+    suggested_bonds JSONB DEFAULT '[]',
+    suggested_flaws JSONB DEFAULT '[]',
+    contacts_and_connections JSONB DEFAULT '[]', -- NPCs and organizations
+    story_hooks JSONB DEFAULT '[]', -- Adventure hooks tied to background
+    variants JSONB DEFAULT '[]', -- Different versions of the background
+    customization_options JSONB DEFAULT '{}', -- Player customization choices
+    -- Expansion fields (compatibility):
     personality_traits JSONB, -- For roleplay elements
     ideals JSONB,
     bonds JSONB,
     flaws JSONB,
-    source_book VARCHAR(100) DEFAULT 'Player''s Handbook 2024'
+    source_book VARCHAR(100) DEFAULT 'Player''s Handbook 2024',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON TABLE backgrounds IS 'Character backgrounds providing skills and story hooks';
 
