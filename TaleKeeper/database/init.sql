@@ -10,29 +10,42 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Character races (Human, Dwarf initially, expandable)
 CREATE TABLE races (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(50) UNIQUE NOT NULL,
+    description TEXT NOT NULL,
     size VARCHAR(20) DEFAULT 'Medium',
     speed INTEGER DEFAULT 30,
-    ability_bonuses JSONB, -- {"strength": 2, "constitution": 1}
-    traits JSONB, -- ["Darkvision", "Dwarven Resilience"]
-    description TEXT,
+    -- D&D 2024: Ability score increases moved to backgrounds, but keeping for compatibility
+    ability_score_increase JSONB DEFAULT '{}', -- {"choice": 2, "options": ["str", "dex"]}
+    traits JSONB DEFAULT '[]', -- ["Darkvision", "Dwarven Resilience"]
+    proficiencies JSONB DEFAULT '{}', -- {"tools": ["Smith's Tools"], "weapons": ["Battleaxe"]}
+    -- D&D 2024 race features:
+    darkvision_range INTEGER DEFAULT 0, -- Distance in feet (60 for dwarves, 0 for humans)
+    special_senses JSONB DEFAULT '[]', -- ["tremorsense 60", "blindsight 30"]
+    languages JSONB DEFAULT '[]', -- ["Common", "Dwarvish"] - JSON for SQLAlchemy compatibility
+    bonus_languages INTEGER DEFAULT 0, -- Extra language choices
+    has_subraces BOOLEAN DEFAULT FALSE, -- Whether race has subraces
+    subrace_name VARCHAR(50), -- For subrace entries
     -- Expansion fields for AI agents:
-    subraces JSONB, -- For future subrace support
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    subraces JSONB DEFAULT '[]', -- For future subrace support
+    source_book VARCHAR(100) DEFAULT 'Player''s Handbook 2024',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 COMMENT ON TABLE races IS 'Playable character races. AI agents: Add new races following D&D 2024 rules';
-COMMENT ON COLUMN races.ability_bonuses IS 'JSON format: {"ability": modifier}';
+COMMENT ON COLUMN races.ability_score_increase IS 'JSON format: {"ability": modifier}';
 
 -- Character classes (Fighter, Rogue initially)
 CREATE TABLE classes (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(50) UNIQUE NOT NULL,
-    hit_die INTEGER NOT NULL, -- d10 for fighter, d8 for rogue
-    primary_ability VARCHAR(20), -- "strength" or "dexterity"
-    saving_throws VARCHAR[], -- ["strength", "constitution"]
-    skill_count INTEGER, -- Number of skills to choose
-    skill_options VARCHAR[], -- Available skills
+    description TEXT, -- Class description
+    hit_die VARCHAR(10) NOT NULL DEFAULT 'd8', -- "d10" for fighter, "d8" for rogue
+    primary_ability JSONB, -- ["strength", "dexterity"] for choice, or single ability
+    saving_throw_proficiencies VARCHAR[], -- ["strength", "constitution"]
+    armor_proficiencies VARCHAR[], -- ["light", "medium", "heavy", "shields"]
+    weapon_proficiencies VARCHAR[], -- ["simple", "martial"]
+    tool_proficiencies VARCHAR[], -- ["thieves_tools"]
+    skill_proficiencies JSONB, -- {"choose": 2, "from": ["Athletics", "Perception"]}
     starting_equipment JSONB, -- Detailed equipment choices
     features_by_level JSONB, -- Level-based features
     -- Expansion fields:
@@ -43,8 +56,8 @@ COMMENT ON TABLE classes IS 'Character classes with progression. AI agents: Use 
 
 -- Subclasses (Champion, Battle Master for Fighter; Thief, Assassin for Rogue)
 CREATE TABLE subclasses (
-    id SERIAL PRIMARY KEY,
-    class_id INTEGER REFERENCES classes(id) ON DELETE CASCADE,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    class_id UUID REFERENCES classes(id) ON DELETE CASCADE,
     name VARCHAR(50) NOT NULL,
     choice_level INTEGER DEFAULT 3, -- Level when subclass is chosen
     features JSONB, -- {"3": ["Improved Critical"], "7": ["Remarkable Athlete"]}
@@ -55,19 +68,24 @@ COMMENT ON TABLE subclasses IS 'Class archetypes chosen at level 3. Extend featu
 
 -- Backgrounds (Farmer, Soldier initially)
 CREATE TABLE backgrounds (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(50) UNIQUE NOT NULL,
+    description TEXT, -- Background description
+    -- D&D 2024: Backgrounds provide ability score increases
+    ability_score_increases JSONB NOT NULL, -- {"choice": 2, "any": 1} or {"strength": 2, "wisdom": 1}
     skill_proficiencies VARCHAR[], -- ["Animal Handling", "Survival"]
     tool_proficiencies VARCHAR[], -- ["Herbalism Kit"]
     languages INTEGER DEFAULT 0, -- Number of bonus languages
     equipment JSONB, -- Starting equipment from background
+    starting_gold VARCHAR(20) DEFAULT '2d4 * 10', -- Alternative to equipment
     feature_name VARCHAR(100), -- "Rustic Hospitality"
     feature_description TEXT,
     -- Expansion fields:
     personality_traits JSONB, -- For roleplay elements
     ideals JSONB,
     bonds JSONB,
-    flaws JSONB
+    flaws JSONB,
+    source_book VARCHAR(100) DEFAULT 'Player''s Handbook 2024'
 );
 COMMENT ON TABLE backgrounds IS 'Character backgrounds providing skills and story hooks';
 
@@ -119,7 +137,7 @@ COMMENT ON COLUMN monsters.actions IS 'Format: [{"name": "Claw", "type": "melee"
 
 -- Items and Equipment
 CREATE TABLE items (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(100) NOT NULL,
     type VARCHAR(50), -- "weapon", "armor", "potion", "scroll", "misc"
     subtype VARCHAR(50), -- "martial_weapon", "heavy_armor", etc.
@@ -172,10 +190,10 @@ CREATE TABLE characters (
     save_slot_id UUID REFERENCES save_slots(id) ON DELETE CASCADE,
     -- Basic info
     name VARCHAR(100) NOT NULL,
-    race_id INTEGER REFERENCES races(id),
-    class_id INTEGER REFERENCES classes(id),
-    subclass_id INTEGER REFERENCES subclasses(id),
-    background_id INTEGER REFERENCES backgrounds(id),
+    race_id UUID REFERENCES races(id),
+    class_id UUID REFERENCES classes(id),
+    subclass_id UUID REFERENCES subclasses(id),
+    background_id UUID REFERENCES backgrounds(id),
     level INTEGER DEFAULT 1,
     experience_points INTEGER DEFAULT 0,
     -- Abilities (base scores)
@@ -226,7 +244,7 @@ COMMENT ON TABLE characters IS 'Player characters with full D&D stats. AI agents
 CREATE TABLE character_inventory (
     id SERIAL PRIMARY KEY,
     character_id UUID REFERENCES characters(id) ON DELETE CASCADE,
-    item_id INTEGER REFERENCES items(id),
+    item_id UUID REFERENCES items(id),
     quantity INTEGER DEFAULT 1,
     equipped BOOLEAN DEFAULT FALSE,
     equipped_slot VARCHAR(50), -- "main_hand", "off_hand", "armor", "ring_1", etc.

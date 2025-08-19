@@ -4,7 +4,32 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**TaleKeeper** is a D&D 2024 web-based tactical RPG with a FastAPI backend, React frontend, and PostgreSQL database. The project implements D&D 5e combat mechanics, character creation, and dungeon exploration in a simplified tactical format.
+**TaleKeeper** is a D&D 2024 web-based tactical RPG with a FastAPI backend, React frontend, and PostgreSQL database. The project implements D&D 2024 combat mechanics, character creation, and dungeon exploration in a simplified tactical format.
+
+## Version Control Standards
+
+### File Management Policy
+- **USE GIT VERSIONING**: Never create multiple physical files with version suffixes (e.g., `file_v2.js`, `backup_file.sql`, `old_component.tsx`)
+- **EDIT IN PLACE**: Always modify existing files directly and commit changes to Git
+- **SINGLE SOURCE OF TRUTH**: Each feature should have one authoritative file, managed through Git history
+- **NO VERSION SUFFIXES**: Avoid file names like `seed_data_2024.sql`, `component_new.js`, `backup_*.anything`
+
+### Correct Approach:
+```bash
+# ✅ CORRECT: Edit existing files
+git add database/seed_data.sql
+git commit -m "Update to D&D 2024 rules with weapon mastery"
+
+# ❌ WRONG: Create versioned files  
+# seed_data_2024.sql
+# seed_data_old.sql
+# seed_data_backup.sql
+```
+
+### Exception Cases:
+- **Configuration variants**: `docker-compose.yml` vs `docker-compose.prod.yml` (different environments)
+- **Template files**: `template.js` vs actual implementation files
+- **Documentation**: Multiple `.md` files for different topics are acceptable
 
 ## Architecture
 

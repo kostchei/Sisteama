@@ -5,52 +5,143 @@
 -- RACES
 -- =====================================================
 
-INSERT INTO races (name, size, speed, ability_bonuses, traits, description) VALUES
-('Human', 'Medium', 30, 
- '{"choice": "any +2, any other +1"}',
+INSERT INTO races (name, description, size, speed, ability_score_increase, traits, proficiencies, darkvision_range, languages, bonus_languages) VALUES
+('Human', 
+ 'Humans are the most adaptable and ambitious people among the common races. They have widely varying tastes, morals, and customs in the many different lands where they have settled.',
+ 'Medium', 30, 
+ '{}',
  '["Resourceful", "Skillful", "Versatile"]',
- 'Humans are the most adaptable and ambitious people. They have widely varying tastes, morals, and customs.'),
+ '{"skills": {"choose": 1, "from": ["any"]}}',
+ 0,
+ '["Common"]',
+ 1),
 
-('Dwarf', 'Medium', 25,
- '{"constitution": 2, "wisdom": 1}',
- '["Darkvision", "Dwarven Resilience", "Stonecunning"]',
- 'Bold and hardy, dwarves are known as skilled warriors, miners, and workers of stone and metal.');
+('Dwarf',
+ 'Bold and hardy, dwarves are known as skilled warriors, miners, and workers of stone and metal. They stand well under 5 feet tall but are so broad and compact that they can weigh as much as a human.',
+ 'Medium', 25,
+ '{}',
+ '["Darkvision", "Dwarven Resilience", "Dwarven Toughness", "Stonecunning"]',
+ '{"tools": ["Smith''s Tools", "Brewer''s Supplies", "Mason''s Tools"], "weapons": ["Battleaxe", "Handaxe", "Light Hammer", "Warhammer"]}',
+ 60,
+ '["Common", "Dwarvish"]',
+ 0);
 
 -- =====================================================
 -- CLASSES
 -- =====================================================
 
-INSERT INTO classes (name, hit_die, primary_ability, saving_throws, skill_count, skill_options, starting_equipment, features_by_level) VALUES
-('Fighter', 10, 'strength', 
- ARRAY['strength', 'constitution'],
- 2,
- ARRAY['Acrobatics', 'Animal Handling', 'Athletics', 'History', 'Insight', 'Intimidation', 'Perception', 'Survival'],
+INSERT INTO classes (name, description, hit_die, primary_ability, saving_throw_proficiencies, armor_proficiencies, weapon_proficiencies, tool_proficiencies, skill_proficiencies, starting_equipment, features_by_level) VALUES
+('Fighter', 'Masters of martial combat, skilled with a variety of weapons and armor. Fighters excel at dealing damage and absorbing punishment.', 'd10', '["strength", "dexterity"]', -- D&D 2024: Choice between STR or DEX
+ '{"strength", "constitution"}',
+ '{"Light armor", "Medium armor", "Heavy armor", "Shields"}',
+ '{"Simple weapons", "Martial weapons"}',
+ '{}',
+ '{"choose": 2, "from": ["Acrobatics", "Animal Handling", "Athletics", "History", "Insight", "Intimidation", "Persuasion", "Perception", "Survival"]}',
  '{
-   "armor": ["chain mail OR leather armor", "shield OR no shield"],
-   "weapons": ["martial weapon and shield OR two martial weapons"],
-   "packs": ["dungeoneers pack OR explorers pack"],
-   "other": ["two handaxes"]
+   "armor": ["Chain Mail OR Leather Armor", "Shield OR no shield"],
+   "weapons": ["Simple and Martial weapons"],
+   "tools": [],
+   "other": ["Explorers Pack", "20 arrows if using ranged weapon"]
  }',
  '{
-   "1": ["Fighting Style", "Second Wind"],
-   "2": ["Action Surge"],
-   "3": ["Martial Archetype"]
+   "1": [
+     {
+       "name": "Fighting Style",
+       "description": "You gain a Fighting Style feat of your choice. Whenever you gain a Fighter level, you can replace this feat with a different Fighting Style feat.",
+       "type": "feat_choice",
+       "options": ["Archery", "Defense", "Dueling", "Great Weapon Fighting", "Protection", "Two-Weapon Fighting"]
+     },
+     {
+       "name": "Second Wind", 
+       "description": "As a Bonus Action, regain Hit Points equal to 1d10 + Fighter level. You can use this feature twice, regaining one use on Short Rest and all uses on Long Rest.",
+       "type": "resource",
+       "uses": 2,
+       "recharge": "short_rest_partial"
+     },
+     {
+       "name": "Weapon Mastery",
+       "description": "You can use the mastery properties of 3 kinds of Simple or Martial weapons. You can change one choice when you finish a Long Rest.",
+       "type": "weapon_mastery",
+       "count": 3
+     }
+   ],
+   "2": [
+     {
+       "name": "Action Surge",
+       "description": "On your turn, you can take one additional action (except Magic action). Once per Short or Long Rest. At level 17, usable twice per rest but only once per turn.",
+       "type": "resource", 
+       "uses": 1,
+       "recharge": "short_rest"
+     },
+     {
+       "name": "Tactical Mind",
+       "description": "When you fail an ability check, you can expend a use of Second Wind to roll 1d10 and add it to the check instead of regaining HP.",
+       "type": "ability"
+     }
+   ],
+   "3": [
+     {
+       "name": "Fighter Subclass",
+       "description": "Choose a Fighter subclass: Champion, Battle Master, Eldritch Knight, or others.",
+       "type": "subclass_choice"
+     }
+   ]
  }'),
 
-('Rogue', 8, 'dexterity',
- ARRAY['dexterity', 'intelligence'],
- 4,
- ARRAY['Acrobatics', 'Athletics', 'Deception', 'Insight', 'Intimidation', 'Investigation', 'Perception', 'Performance', 'Persuasion', 'Sleight of Hand', 'Stealth'],
+('Rogue', 'Skilled in stealth and precision, rogues excel at striking from the shadows and solving problems with finesse rather than force.', 'd8', '["dexterity"]', -- D&D 2024: DEX is primary
+ '{"dexterity", "intelligence"}',
+ '{"Light armor"}',
+ '{"Simple weapons", "Martial weapons with Finesse or Light property"}',
+ '{"Thieves Tools"}',
+ '{"choose": 4, "from": ["Acrobatics", "Athletics", "Deception", "Insight", "Intimidation", "Investigation", "Perception", "Persuasion", "Sleight of Hand", "Stealth"]}',
  '{
-   "armor": ["leather armor"],
-   "weapons": ["rapier OR shortsword", "shortbow and 20 arrows OR shortsword"],
-   "packs": ["burglars pack OR dungeoneers pack OR explorers pack"],
-   "other": ["two daggers", "thieves tools"]
+   "armor": ["Leather Armor"],
+   "weapons": ["Simple weapons", "Martial weapons with Finesse or Light property"],
+   "tools": ["Thieves Tools"],
+   "other": ["Burglars Pack", "Two Daggers"]
  }',
  '{
-   "1": ["Expertise", "Sneak Attack", "Thieves Cant"],
-   "2": ["Cunning Action"],
-   "3": ["Roguish Archetype"]
+   "1": [
+     {
+       "name": "Expertise", 
+       "description": "Choose 2 skill proficiencies. Your Proficiency Bonus is doubled for any ability check using those skills.",
+       "type": "expertise",
+       "count": 2
+     },
+     {
+       "name": "Sneak Attack",
+       "description": "Once per turn, deal extra 1d6 damage to a creature you hit with a Finesse or Ranged weapon if you have Advantage or an ally is within 5 feet of the target.",
+       "type": "sneak_attack",
+       "damage": "1d6"
+     },
+     {
+       "name": "Thieves Cant",
+       "description": "You know Thieves Cant, a secret mix of dialect, jargon, and code that allows you to hide messages in seemingly normal conversation.",
+       "type": "language"
+     },
+     {
+       "name": "Weapon Mastery",
+       "description": "You can use the mastery properties of 2 kinds of Simple or Martial weapons with the Finesse or Light property.",
+       "type": "weapon_mastery", 
+       "count": 2,
+       "restriction": "finesse_or_light"
+     }
+   ],
+   "2": [
+     {
+       "name": "Cunning Action",
+       "description": "You can take a Bonus Action to take the Dash, Disengage, or Hide action.",
+       "type": "bonus_action_options",
+       "options": ["Dash", "Disengage", "Hide"]
+     }
+   ],
+   "3": [
+     {
+       "name": "Rogue Subclass", 
+       "description": "Choose a Rogue subclass: Thief, Assassin, Arcane Trickster, or others.",
+       "type": "subclass_choice"
+     }
+   ]
  }');
 
 -- =====================================================
@@ -59,7 +150,7 @@ INSERT INTO classes (name, hit_die, primary_ability, saving_throws, skill_count,
 
 INSERT INTO subclasses (class_id, name, choice_level, features, description) VALUES
 -- Fighter subclasses
-(1, 'Champion', 3,
+((SELECT id FROM classes WHERE name = 'Fighter'), 'Champion', 3,
  '{
    "3": ["Improved Critical"],
    "7": ["Remarkable Athlete"],
@@ -69,7 +160,7 @@ INSERT INTO subclasses (class_id, name, choice_level, features, description) VAL
  }',
  'The archetypal Champion focuses on the development of raw physical power honed to deadly perfection.'),
 
-(1, 'Battle Master', 3,
+((SELECT id FROM classes WHERE name = 'Fighter'), 'Battle Master', 3,
  '{
    "3": ["Combat Superiority", "Student of War"],
    "7": ["Know Your Enemy"],
@@ -80,7 +171,7 @@ INSERT INTO subclasses (class_id, name, choice_level, features, description) VAL
  'Those who emulate the archetypal Battle Master employ martial techniques passed down through generations.'),
 
 -- Rogue subclasses
-(2, 'Thief', 3,
+((SELECT id FROM classes WHERE name = 'Rogue'), 'Thief', 3,
  '{
    "3": ["Fast Hands", "Second-Story Work"],
    "9": ["Supreme Sneak"],
@@ -89,7 +180,7 @@ INSERT INTO subclasses (class_id, name, choice_level, features, description) VAL
  }',
  'You hone your skills in the larcenous arts. Burglars, bandits, cutpurses, and other criminals typically follow this archetype.'),
 
-(2, 'Assassin', 3,
+((SELECT id FROM classes WHERE name = 'Rogue'), 'Assassin', 3,
  '{
    "3": ["Assassinate", "Bonus Proficiencies"],
    "9": ["Infiltration Expertise"],
@@ -102,28 +193,28 @@ INSERT INTO subclasses (class_id, name, choice_level, features, description) VAL
 -- BACKGROUNDS
 -- =====================================================
 
-INSERT INTO backgrounds (name, skill_proficiencies, tool_proficiencies, languages, equipment, feature_name, feature_description) VALUES
+INSERT INTO backgrounds (name, description, ability_score_increases, skill_proficiencies, tool_proficiencies, languages, equipment, starting_gold, feature_name, feature_description) VALUES
 ('Farmer', 
- ARRAY['Animal Handling', 'Nature'],
- ARRAY['Herbalism Kit'],
- 1,
- '{
-   "items": ["herbalism kit", "shovel", "iron pot", "common clothes"],
-   "gold": 10
- }',
+ 'You worked the land, understanding the cycles of nature and the value of hard work.',
+ '{"choice": 2, "any": 1}',
+ '{"Animal Handling", "Nature"}',
+ '{"Herbalism Kit"}',
+ 0,
+ '["Herbalism Kit", "Shovel", "Iron Pot", "Set of Common Clothes", "Belt Pouch"]',
+ '2d4 * 10',
  'Rustic Hospitality',
- 'Since you come from the ranks of the common folk, you fit in among them with ease. You can find a place to hide, rest, or recuperate among other commoners.'),
+ 'Since you come from the ranks of the common folk, you fit in among them with ease. You can find a place to hide, rest, or recuperate among other commoners, unless you have shown yourself to be a danger to them.'),
 
 ('Soldier',
- ARRAY['Athletics', 'Intimidation'],
- ARRAY['Gaming Set', 'Land Vehicles'],
+ 'You served in a military organization, trained in tactics and discipline.',
+ '{"strength": 2, "constitution": 1}',
+ '{"Athletics", "Intimidation"}',
+ '{"Gaming Set", "Land Vehicles"}',
  0,
- '{
-   "items": ["insignia of rank", "trophy from fallen enemy", "deck of cards", "common clothes"],
-   "gold": 10
- }',
+ '["Insignia of Rank", "Trophy from Fallen Enemy", "Deck of Cards", "Set of Common Clothes", "Belt Pouch"]',
+ '2d4 * 10',
  'Military Rank',
- 'You have a military rank from your career as a soldier. Soldiers loyal to your former military organization still recognize your authority and influence.');
+ 'You have a military rank from your career as a soldier. Soldiers loyal to your former military organization still recognize your authority and influence, and they defer to you if they are of a lower rank.');
 
 -- =====================================================
 -- MONSTERS (Level 1-3 appropriate)
@@ -174,7 +265,7 @@ INSERT INTO monsters (name, challenge_rating, size, type, alignment, armor_class
  '{"walk": 30}',
  7, 15, 10, 3, 5, 3,
  '{}', '{"stealth": 4}',
- '{"darkvision": 60, "passive_perception": 7}', ARRAY[],
+ '{"darkvision": 60, "passive_perception": 7}', ARRAY[]::VARCHAR[],
  '[{
    "name": "Bite",
    "type": "melee",
@@ -297,7 +388,7 @@ INSERT INTO monsters (name, challenge_rating, size, type, alignment, armor_class
  '{"walk": 20}',
  13, 6, 16, 3, 6, 5,
  '{"wisdom": 0}', '{}',
- '{"darkvision": 60, "passive_perception": 8}', ARRAY[],
+ '{"darkvision": 60, "passive_perception": 8}', ARRAY[]::VARCHAR[],
  '[{
    "name": "Slam",
    "type": "melee",
@@ -326,7 +417,7 @@ INSERT INTO items (name, type, subtype, rarity, weight, cost_gp, damage_dice, da
 ('Club', 'weapon', 'simple_melee', 'common', 2, 0.1, '1d4', 'bludgeoning', '["light"]'),
 ('Dagger', 'weapon', 'simple_melee', 'common', 1, 2, '1d4', 'piercing', '["finesse", "light", "thrown"]'),
 ('Handaxe', 'weapon', 'simple_melee', 'common', 2, 5, '1d6', 'slashing', '["light", "thrown"]'),
-('Mace', 'weapon', 'simple_melee', 'common', 4, 5, '1d6', 'bludgeoning', '[]'),
+('Mace', 'weapon', 'simple_melee', 'common', 4, 5, '1d6', 'bludgeoning', '{}'),
 ('Quarterstaff', 'weapon', 'simple_melee', 'common', 4, 0.2, '1d6', 'bludgeoning', '["versatile"]'),
 ('Spear', 'weapon', 'simple_melee', 'common', 3, 1, '1d6', 'piercing', '["thrown", "versatile"]'),
 
@@ -346,15 +437,15 @@ INSERT INTO items (name, type, subtype, rarity, weight, cost_gp, damage_dice, da
 ('Longbow', 'weapon', 'martial_ranged', 'common', 2, 50, '1d8', 'piercing', '["ammunition", "heavy", "two-handed"]'),
 
 -- Armor
-('Leather Armor', 'armor', 'light_armor', 'common', 10, 10, NULL, NULL, '[]'),
-('Studded Leather', 'armor', 'light_armor', 'common', 13, 45, NULL, NULL, '[]'),
-('Hide Armor', 'armor', 'medium_armor', 'common', 12, 10, NULL, NULL, '[]'),
-('Chain Shirt', 'armor', 'medium_armor', 'common', 20, 50, NULL, NULL, '[]'),
+('Leather Armor', 'armor', 'light_armor', 'common', 10, 10, NULL, NULL, '{}'),
+('Studded Leather', 'armor', 'light_armor', 'common', 13, 45, NULL, NULL, '{}'),
+('Hide Armor', 'armor', 'medium_armor', 'common', 12, 10, NULL, NULL, '{}'),
+('Chain Shirt', 'armor', 'medium_armor', 'common', 20, 50, NULL, NULL, '{}'),
 ('Scale Mail', 'armor', 'medium_armor', 'common', 45, 50, NULL, NULL, '["disadvantage_stealth"]'),
 ('Chain Mail', 'armor', 'heavy_armor', 'common', 55, 75, NULL, NULL, '["disadvantage_stealth"]'),
 ('Splint Armor', 'armor', 'heavy_armor', 'common', 60, 200, NULL, NULL, '["disadvantage_stealth"]'),
 ('Plate Armor', 'armor', 'heavy_armor', 'common', 65, 1500, NULL, NULL, '["disadvantage_stealth"]'),
-('Shield', 'armor', 'shield', 'common', 6, 10, NULL, NULL, '[]');
+('Shield', 'armor', 'shield', 'common', 6, 10, NULL, NULL, '{}');
 
 -- Set armor class values
 UPDATE items SET armor_class = 11 WHERE name = 'Leather Armor';
@@ -427,10 +518,10 @@ INSERT INTO characters (
 ) VALUES (
     (SELECT id FROM save_slots WHERE slot_number = 1),
     'Test Fighter',
-    1, -- Human
-    1, -- Fighter
-    1, -- Champion
-    2, -- Soldier
+    (SELECT id FROM races WHERE name = 'Human'),
+    (SELECT id FROM classes WHERE name = 'Fighter'),
+    (SELECT id FROM subclasses WHERE name = 'Champion'),
+    (SELECT id FROM backgrounds WHERE name = 'Soldier'),
     1,
     0,
     16, 14, 14, 10, 12, 8,
@@ -458,3 +549,31 @@ INSERT INTO character_inventory (character_id, item_id, equipped, equipped_slot)
 -- Create a game state for the test character
 INSERT INTO game_states (character_id, current_location, dungeon_level, rooms_cleared) VALUES
 ((SELECT id FROM characters WHERE name = 'Test Fighter'), 'town', 0, 0);
+
+-- =====================================================
+-- D&D 2024 WEAPON MASTERY PROPERTIES
+-- =====================================================
+
+-- Add weapon mastery properties to existing weapons (new D&D 2024 feature)
+UPDATE items SET properties = properties || '["mastery_nick"]' WHERE name = 'Scimitar';
+UPDATE items SET properties = properties || '["mastery_vex"]' WHERE name = 'Longsword';
+UPDATE items SET properties = properties || '["mastery_nick"]' WHERE name = 'Shortsword';
+UPDATE items SET properties = properties || '["mastery_vex"]' WHERE name = 'Rapier';
+UPDATE items SET properties = properties || '["mastery_cleave"]' WHERE name = 'Greatsword';
+UPDATE items SET properties = properties || '["mastery_topple"]' WHERE name = 'Battleaxe';
+UPDATE items SET properties = properties || '["mastery_push"]' WHERE name = 'Warhammer';
+UPDATE items SET properties = properties || '["mastery_slow"]' WHERE name = 'Club';
+UPDATE items SET properties = properties || '["mastery_nick"]' WHERE name = 'Dagger';
+UPDATE items SET properties = properties || '["mastery_slow"]' WHERE name = 'Mace';
+UPDATE items SET properties = properties || '["mastery_topple"]' WHERE name = 'Quarterstaff';
+UPDATE items SET properties = properties || '["mastery_sap"]' WHERE name = 'Spear';
+
+-- Mastery property descriptions for reference:
+-- mastery_cleave: Hit another creature within reach if original attack hits
+-- mastery_graze: Deal damage equal to ability modifier on missed attack
+-- mastery_nick: Make extra light weapon attack as bonus action when dual wielding
+-- mastery_push: Push target 10 feet away on hit
+-- mastery_sap: Give target disadvantage on next attack if you hit
+-- mastery_slow: Reduce target's speed by 10 feet until start of your next turn
+-- mastery_topple: Knock target prone if you hit with advantage  
+-- mastery_vex: Give yourself advantage on next attack against same target

@@ -53,7 +53,7 @@ async def get_races(db: Session = Depends(get_db)):
                 "name": race.name,
                 "size": race.size,
                 "speed": race.speed,
-                "ability_bonuses": race.ability_bonuses,
+                "ability_score_increase": race.ability_score_increase,
                 "traits": race.traits,
                 "description": race.description
             }

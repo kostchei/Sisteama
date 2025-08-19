@@ -28,7 +28,7 @@ services:
     build: ./backend
     container_name: dnd_backend
     environment:
-      DATABASE_URL: postgresql://dnd_admin:secure_password_change_me@db:5432/dnd_game
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       PYTHONUNBUFFERED: 1
     volumes:
       - ./backend:/app
@@ -62,7 +62,7 @@ services:
 
   # Adminer for database management (optional, useful for development)
   adminer:
-    image: adminer
+    image: adminer:latest
     container_name: dnd_adminer
     ports:
       - "8080:8080"
