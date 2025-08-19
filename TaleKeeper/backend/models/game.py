@@ -50,13 +50,13 @@ class GameState(Base):
     character_id = Column(UUID(as_uuid=True), ForeignKey("characters.id", ondelete="CASCADE"), nullable=False)
     
     # Game progress
-    status = Column(SQLEnum(GameStatus), nullable=False, default=GameStatus.ACTIVE)
+    status = Column(String(20), nullable=False, default="ACTIVE")
     total_playtime_minutes = Column(Integer, default=0)
     last_played = Column(DateTime(timezone=True), server_default=func.now())
     
     # Location and exploration
     current_location = Column(String(100), default="Starting Town")
-    location_type = Column(SQLEnum(LocationType), default=LocationType.TOWN)
+    location_type = Column(String(20), default="TOWN")
     discovered_locations = Column(JSON, default=list)  # List of discovered location names
     
     # Resources

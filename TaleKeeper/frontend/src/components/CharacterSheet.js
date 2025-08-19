@@ -173,7 +173,7 @@ const CharacterSheet = () => {
         armor_class: 10 + calculateModifier(finalStats.dex)
       };
       
-      await characterAPI.updateCharacter(character.id, updatedCharacter);
+      await characterAPI.update(character.id, updatedCharacter);
       updateCharacter(updatedCharacter);
       
       navigate('/game');

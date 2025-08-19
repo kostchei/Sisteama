@@ -75,9 +75,9 @@ class Item(Base):
     description = Column(Text, nullable=False, default="")
     
     # Item categorization
-    type = Column(SQLEnum(ItemType), nullable=False)
+    type = Column(String(50), nullable=False)  # weapon, armor, gear, etc.
     subtype = Column(String(50), nullable=True)  # e.g., "longsword", "plate armor"
-    rarity = Column(SQLEnum(ItemRarity), nullable=False, default=ItemRarity.COMMON)
+    rarity = Column(String(20), nullable=False, default="common")
     
     # Economic properties
     cost_gp = Column(Numeric(10, 2), nullable=True, default=0)

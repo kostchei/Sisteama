@@ -239,6 +239,8 @@ CREATE TABLE characters (
     hit_dice_max INTEGER, -- Maximum hit dice (equal to level)
     -- Proficiencies
     proficiency_bonus INTEGER DEFAULT 2,
+    proficiencies JSONB DEFAULT '[]', -- Combined proficiencies for simplified model
+    features JSONB DEFAULT '{}', -- Class and racial features
     skill_proficiencies VARCHAR[], -- ["Athletics", "Perception"]
     tool_proficiencies VARCHAR[],
     weapon_proficiencies VARCHAR[], -- ["simple", "martial"]
@@ -254,6 +256,11 @@ CREATE TABLE characters (
     silver INTEGER DEFAULT 0,
     gold INTEGER DEFAULT 0,
     platinum INTEGER DEFAULT 0,
+    -- Equipment (for simplified model - separate inventory system also exists)
+    equipment_main_hand UUID REFERENCES items(id),
+    equipment_off_hand UUID REFERENCES items(id),
+    equipment_armor UUID REFERENCES items(id), 
+    equipment_shield UUID REFERENCES items(id),
     -- Expansion fields:
     spell_slots_used JSONB, -- {"1": 2, "2": 1} for casters
     prepared_spells INTEGER[], -- References to spell table

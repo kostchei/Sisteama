@@ -246,24 +246,80 @@ class CharacterService:
                               background: Background):
         """Add starting equipment to character inventory."""
         
-        # Add class starting equipment
+        # Add class starting equipment (structured format)
         if character_class.starting_equipment:
-            for equipment_name in character_class.starting_equipment:
-                self._add_equipment_by_name(character.id, equipment_name)
+            if isinstance(character_class.starting_equipment, dict):
+                self._process_structured_equipment(character.id, character_class.starting_equipment)
+            else:
+                # Fallback for list format
+                for equipment_name in character_class.starting_equipment:
+                    self._add_equipment_by_name(character.id, equipment_name)
         
-        # Add background starting equipment
+        # Add background starting equipment (list format)  
         if background.starting_equipment:
             for equipment_name in background.starting_equipment:
                 self._add_equipment_by_name(character.id, equipment_name)
+    
+    def _process_structured_equipment(self, character_id: UUID, equipment_dict: dict):
+        """Process structured starting equipment (from classes)."""
+        
+        for category, items in equipment_dict.items():
+            if not items:  # Skip empty categories
+                continue
+                
+            logger.debug(f"Processing {category} equipment: {items}")
+            
+            # Process each item in the category
+            for item_desc in items:
+                if isinstance(item_desc, str):
+                    # Handle choice descriptions like "Chain Mail OR Leather Armor"
+                    if " OR " in item_desc:
+                        # Take the first option for simplicity
+                        item_name = item_desc.split(" OR ")[0].strip()
+                        if item_name != "no shield":  # Skip "no shield" options
+                            self._add_equipment_by_name(character_id, item_name)
+                    else:
+                        # Skip generic descriptions
+                        skip_generics = ["Simple and Martial weapons", "Simple weapons", 
+                                       "Martial weapons with Finesse or Light property",
+                                       "Explorers Pack", "Burglars Pack", "20 arrows if using ranged weapon"]
+                        if item_desc not in skip_generics:
+                            self._add_equipment_by_name(character_id, item_desc)
     
     def _add_equipment_by_name(self, character_id: UUID, equipment_name: str):
         """Add equipment to character by name (helper method)."""
         
         try:
-            # Find item by name
+            # Skip non-equipment items (like clothing, pouches, etc.)
+            skip_items = ["Common Clothes", "Belt Pouch", "Insignia of Rank", "Trophy from Fallen Enemy", 
+                         "Deck of Cards", "Shovel", "Iron Pot"]
+            if any(skip_item in equipment_name for skip_item in skip_items):
+                logger.debug(f"Skipping non-equipment item: {equipment_name}")
+                return
+            
+            # Handle special name mappings
+            name_mappings = {
+                "Herbalism Kit": "Healers Kit",
+                "Gaming Set": None,  # Skip generic gaming sets
+                "Land Vehicles": None  # Skip vehicle proficiency
+            }
+            
+            mapped_name = name_mappings.get(equipment_name)
+            if mapped_name is None and equipment_name in name_mappings:
+                logger.debug(f"Skipping mapped item: {equipment_name}")
+                return
+            
+            search_name = mapped_name if mapped_name else equipment_name
+            
+            # Find item by exact name first, then partial match
             item = self.db.execute(
-                select(Item).where(Item.name.ilike(f"%{equipment_name}%"))
+                select(Item).where(Item.name == search_name)
             ).scalar_one_or_none()
+            
+            if not item:
+                item = self.db.execute(
+                    select(Item).where(Item.name.ilike(f"%{search_name}%"))
+                ).scalar_one_or_none()
             
             if item:
                 # Check if character already has this item
@@ -287,11 +343,13 @@ class CharacterService:
                         notes=f"Starting equipment"
                     )
                     self.db.add(inventory_item)
+                logger.debug(f"Added starting equipment: {equipment_name} -> {item.name}")
             else:
-                logger.warning(f"Starting equipment not found: {equipment_name}")
+                logger.debug(f"Starting equipment not found in items table: {equipment_name}")
                 
         except Exception as e:
             logger.error(f"Error adding starting equipment {equipment_name}: {e}")
+            # Don't re-raise the exception to avoid aborting the entire transaction
     
     def level_up_character(self, character_id: str) -> Dict[str, Any]:
         """Handle character leveling up."""

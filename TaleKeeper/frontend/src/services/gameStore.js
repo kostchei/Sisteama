@@ -23,10 +23,16 @@ const useGameStore = create(
       // Character state
       character: null,
       setCharacter: (character) => set({ character }),
+      updateCharacter: (updates) => set((state) => ({ 
+        character: state.character ? { ...state.character, ...updates } : updates 
+      })),
       
       // Game state
       gameState: null,
       setGameState: (gameState) => set({ gameState }),
+      updateGameState: (updates) => set((state) => ({ 
+        gameState: state.gameState ? { ...state.gameState, ...updates } : updates 
+      })),
       
       // UI state
       isLoading: false,
