@@ -193,7 +193,7 @@ INSERT INTO subclasses (class_id, name, choice_level, features, description) VAL
 -- BACKGROUNDS
 -- =====================================================
 
-INSERT INTO backgrounds (name, description, ability_score_increases, skill_proficiencies, tool_proficiencies, languages, equipment, starting_gold, feature_name, feature_description) VALUES
+INSERT INTO backgrounds (name, description, ability_score_increases, skill_proficiencies, tool_proficiencies, languages, starting_equipment, starting_gold, feature_name, feature_description) VALUES
 ('Farmer', 
  'You worked the land, understanding the cycles of nature and the value of hard work.',
  '{"choice": 2, "any": 1}',
@@ -507,7 +507,7 @@ INSERT INTO characters (
     level,
     experience_points,
     strength, dexterity, constitution, intelligence, wisdom, charisma,
-    max_hit_points, current_hit_points,
+    hit_points_max, hit_points_current,
     armor_class,
     proficiency_bonus,
     skill_proficiencies,

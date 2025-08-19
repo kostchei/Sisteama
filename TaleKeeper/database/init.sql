@@ -228,9 +228,9 @@ CREATE TABLE characters (
     wisdom INTEGER DEFAULT 10,
     charisma INTEGER DEFAULT 10,
     -- Combat stats (calculated but stored for performance)
-    max_hit_points INTEGER,
-    current_hit_points INTEGER,
-    temp_hit_points INTEGER DEFAULT 0,
+    hit_points_max INTEGER,
+    hit_points_current INTEGER,
+    hit_points_temporary INTEGER DEFAULT 0,
     armor_class INTEGER DEFAULT 10,
     initiative_bonus INTEGER DEFAULT 0,
     speed INTEGER DEFAULT 30,

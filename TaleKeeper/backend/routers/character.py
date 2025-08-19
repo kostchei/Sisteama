@@ -96,8 +96,8 @@ async def get_backgrounds(db: Session = Depends(get_db)):
                 "name": bg.name,
                 "skill_proficiencies": bg.skill_proficiencies,
                 "tool_proficiencies": bg.tool_proficiencies,
-                "languages": bg.languages,
-                "equipment": bg.equipment,
+                "languages": bg.language_proficiencies,
+                "equipment": bg.starting_equipment,
                 "feature_name": bg.feature_name,
                 "feature_description": bg.feature_description
             }
@@ -146,33 +146,14 @@ async def create_character(
     try:
         service = CharacterService(db)
         
-        # Validate race, class, background exist
-        race = db.get(Race, character_data.race_id)
-        if not race:
-            raise HTTPException(status_code=404, detail="Race not found")
+        # Create character (service handles validation)
+        result = service.create_character(character_data)
         
-        char_class = db.get(Class, character_data.class_id)
-        if not char_class:
-            raise HTTPException(status_code=404, detail="Class not found")
+        if not result.get("success"):
+            raise HTTPException(status_code=400, detail=result.get("message", "Failed to create character"))
         
-        background = db.get(Background, character_data.background_id)
-        if not background:
-            raise HTTPException(status_code=404, detail="Background not found")
-        
-        # Create character
-        character = service.create_character(
-            name=character_data.name,
-            race=race,
-            char_class=char_class,
-            background=background,
-            subclass_id=character_data.subclass_id,
-            ability_scores=character_data.ability_scores,
-            skill_choices=character_data.skill_choices,
-            equipment_choices=character_data.equipment_choices,
-            save_slot=character_data.save_slot
-        )
-        
-        return CharacterResponse.from_orm(character)
+        character = result["character"]
+        return character  # Return the character dict directly
         
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

@@ -156,6 +156,7 @@ class CharacterCreate(BaseModel):
     race_id: str
     class_id: str
     background_id: str
+    subclass_id: Optional[str] = None  # Optional - chosen at level 3 for most classes
     
     # Starting ability scores (before racial bonuses)
     strength: int = Field(default=10, ge=8, le=15)
@@ -164,6 +165,12 @@ class CharacterCreate(BaseModel):
     intelligence: int = Field(default=10, ge=8, le=15)
     wisdom: int = Field(default=10, ge=8, le=15)
     charisma: int = Field(default=10, ge=8, le=15)
+    
+    # Character creation choices
+    ability_scores: Optional[Dict[str, int]] = None  # Override individual scores if provided
+    skill_choices: Optional[List[str]] = None  # Chosen skills from class/background
+    equipment_choices: Optional[Dict[str, Any]] = None  # Starting equipment selections
+    save_slot: Optional[int] = Field(default=1, ge=1, le=10)  # Save slot number
     
     notes: Optional[str] = ""
 
